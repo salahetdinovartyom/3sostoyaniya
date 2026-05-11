@@ -1,5 +1,8 @@
 package ru.kursk.threeSost.lwjgl3;
 
+import static ru.kursk.threeSost.GameSettings.SCREEN_WIDTH;
+import static ru.kursk.threeSost.GameSettings.SCREEN_HEIGHT;
+
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import ru.kursk.threeSost.MyGdxGame;
@@ -19,7 +22,7 @@ public class Lwjgl3Launcher {
         configuration.setTitle("Три состояния");
         configuration.useVsync(true);
         configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate + 1);
-        configuration.setWindowedMode(640, 480);
+        configuration.setWindowedMode(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
         configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
 //        configuration.setOpenGLEmulation(Lwjgl3ApplicationConfiguration.GLEmulation.ANGLE_GLES20, 0, 0);
 

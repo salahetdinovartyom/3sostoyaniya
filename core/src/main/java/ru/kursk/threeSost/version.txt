@@ -3,3 +3,4 @@
     буква в начале выбирается от первой буквы имени участника команды.
 a1.0 - Созданы GameScreen, GameSettings,version.txt. Удалил аннотации из Lwjgl3Launcher, изменил MyGdxGame.
 a1.1 - Дописал version.txt
+a2.0 - Добавил GameResources, GameObject, PlayerObject, KeyManager(но не дописал его). В GameSettings дописал поля, изменил размер окна игры в Lwjgl3Launcher, добавил игрока на экран. У игрока пока будет текстура корабля.
