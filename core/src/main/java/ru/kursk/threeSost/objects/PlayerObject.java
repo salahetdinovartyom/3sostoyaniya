@@ -29,7 +29,6 @@ public class PlayerObject extends GameObject {
     private final float startX;
     private final float startY;
     private Texture shipTexture;
-    private int livesLeft;
     private int groundContacts;
     private boolean facingRight;
 
@@ -37,7 +36,6 @@ public class PlayerObject extends GameObject {
         super(null, x, y, width, height, PLAYER_BIT, world);
         this.startX = x;
         this.startY = y;
-        this.livesLeft = 3;
         this.facingRight = true;
 
         body.setFixedRotation(true);
@@ -105,15 +103,6 @@ public class PlayerObject extends GameObject {
         body.setLinearVelocity(0f, 0f);
         body.setAwake(true);
         groundContacts = 0;
-    }
-
-    @Override
-    public void hit() {
-        livesLeft--;
-    }
-
-    public boolean isAlive() {
-        return livesLeft > 0;
     }
 
     @Override

@@ -56,7 +56,7 @@ configure(subprojects - project(':android')) {
 
 subprojects {
   version = "$projectVersion"
-  ext.appName = 'ТрТритрозукмоумзкмтукмткуумотмукталаалтааоал№№№№№№№лаалалоамшкмщшкщосмуОППООО3sostoyaniya'
+  ext.appName = 'Три состояния'
   repositories {
     mavenCentral()
     // You may want to remove the following line if you have errors downloading dependencies.
@@ -66,4 +66,4 @@ subprojects {
   }
 }
 
-eclipse.project.name = 'ТрТритрозукмоумзкмтукмткуумотмукталаалтааоал№№№№№№№лаалалоамшкмщшкщосмуОППООО3sostoyaniya' + '-parent'
+eclipse.project.name = 'Три состояния' + '-parent'
