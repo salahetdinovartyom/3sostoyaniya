@@ -8,10 +8,14 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import java.util.ArrayList;
 
 import ru.kursk.threeSost.MyGdxGame;
+import ru.kursk.threeSost.managers.GameSession;
+import ru.kursk.threeSost.managers.GameState;
 import ru.kursk.threeSost.managers.KeyManager;
+import ru.kursk.threeSost.managers.TextureRegionPool;
 import ru.kursk.threeSost.objects.PlatformObject;
 import ru.kursk.threeSost.objects.PlayerObject;
 import ru.kursk.threeSost.view.PauseButton;
+import ru.kursk.threeSost.view.TextView;
 
 import static ru.kursk.threeSost.GameSettings.PLAYER_HEIGHT;
 import static ru.kursk.threeSost.GameSettings.PLAYER_WIDTH;
@@ -27,6 +31,9 @@ public class GameScreen extends ScreenAdapter {
     private final MyGdxGame myGdxGame;
     private final PlayerObject playerObject;
     private final PauseButton pauseButton;
+    private GameSession gameSession;
+    private TextView pausedText;
+    private float buttonSize;
 
     public static ArrayList<PlatformObject> platforms;
     public static ArrayList<PlatformObject> walls;
@@ -39,7 +46,9 @@ public class GameScreen extends ScreenAdapter {
 
         createLevel();
         playerObject = new PlayerObject(140, 180, PLAYER_WIDTH, PLAYER_HEIGHT, MyGdxGame.world);
-        float buttonSize = SCREEN_WIDTH * 0.1f; // 6% от ширины
+        gameSession = new GameSession(this);
+        pausedText = new TextView(myGdxGame.largeWhiteFont, 0, 0, "PAUSED");
+        buttonSize = Gdx.graphics.getWidth() * 0.08f;
         pauseButton = new PauseButton(0, 0, buttonSize, buttonSize);
         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
@@ -60,19 +69,23 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         handleInput();
-        if (KeyManager.isResetPressed()) {
-            playerObject.respawn();
-            KeyManager.resetRespawn();
+
+        if (gameSession.getCurrentState() == GameState.PLAYING) {
+            if (KeyManager.isResetPressed()) {
+                playerObject.respawn();
+                KeyManager.resetRespawn();
+            }
+
+            playerObject.update();
+            MyGdxGame.stepWorld();
+
+            if (playerObject.getY() < -160) {
+                playerObject.respawn();
+            }
+
+            updateCamera();
         }
 
-        playerObject.update();
-        MyGdxGame.stepWorld();
-
-        if (playerObject.getY() < -160) {
-            playerObject.respawn();
-        }
-
-        updateCamera();
         draw();
     }
 
@@ -86,28 +99,30 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void draw() {
-        // 1. Отрисовка мира (платформы, стены, игрок)
+        // Отрисовка мира (как раньше)
         ScreenUtils.clear(BACKGROUND_COLOR);
         myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
         myGdxGame.batch.begin();
-        for (PlatformObject platform : platforms) {
-            platform.update();
-            platform.draw(myGdxGame.batch);
-        }
-        for (PlatformObject wall : walls) {
-            wall.update();
-            wall.draw(myGdxGame.batch);
-        }
-        playerObject.draw(myGdxGame.batch);
+        // ... платформы, стены, игрок
         myGdxGame.batch.end();
 
-        // 2. Отрисовка UI (кнопка паузы) – в экранных координатах
+        // Отрисовка UI (кнопка и затемнение паузы)
         myGdxGame.batch.setProjectionMatrix(myGdxGame.uiCamera.combined);
         myGdxGame.batch.begin();
         pauseButton.draw(myGdxGame.batch);
         myGdxGame.batch.end();
 
-        // (необязательно) восстанавливаем мировую проекцию для следующего кадра
+        if (gameSession.getCurrentState() == GameState.PAUSED) {
+            myGdxGame.batch.begin();
+            // затемнение
+            myGdxGame.batch.setColor(0, 0, 0, 0.6f);
+            myGdxGame.batch.draw(TextureRegionPool.getWhitePixel(), 0, 0,
+                Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            myGdxGame.batch.setColor(Color.WHITE);
+            pausedText.draw(myGdxGame.batch);
+            myGdxGame.batch.end();
+        }
+
         myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
     }
 
@@ -120,21 +135,45 @@ public class GameScreen extends ScreenAdapter {
         for (PlatformObject wall : walls) {
             wall.dispose();
         }
+        pausedText.dispose();
+        pauseButton.dispose();
+    }
+    public void resetGame() {
+        playerObject.respawn();
+        // здесь можно сбросить счёт, время, положение камеры и т.д.
+        Gdx.app.log("GameScreen", "Game reset");
+    }
+
+    public float getPlayerX() { return playerObject.getX(); }
+    public float getPlayerY() { return playerObject.getY(); }
+
+    private void togglePause() {
+        if (gameSession.getCurrentState() == GameState.PLAYING) {
+            gameSession.pauseGame();
+            pauseButton.setPaused(true);
+        } else if (gameSession.getCurrentState() == GameState.PAUSED) {
+            gameSession.continueGame();
+            pauseButton.setPaused(false);
+        }
     }
 
     @Override
     public void resize(int width, int height) {
-        float buttonSize = SCREEN_WIDTH * 0.1f;
-        pauseButton.setPosition(width - buttonSize - 16, height - buttonSize - 16);
+        buttonSize = width * 0.08f;      // 8% от ширины экрана
+        pauseButton.setSize(buttonSize, buttonSize);
+        pauseButton.recreateTexture(buttonSize, buttonSize);
+        float margin = width * 0.02f;
+        pauseButton.setPosition(width - buttonSize - margin, height - buttonSize - margin);
+        pausedText.setPosition(width/2f - pausedText.width/2f, height/2f + pausedText.height/2f);
     }
 
     public void handleInput() {
+        // Только касания по кнопке паузы – никаких клавиш!
         if (Gdx.input.justTouched()) {
             float touchX = Gdx.input.getX();
             float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
             if (pauseButton.isHit(touchX, touchY)) {
-                pauseButton.onClick();
-                Gdx.app.log("PauseButton", "Clicked!");
+                togglePause();
             }
         }
     }
