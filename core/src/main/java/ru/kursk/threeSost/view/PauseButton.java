@@ -43,10 +43,6 @@ public class PauseButton extends ButtonView {
         createPlayTexture();
         setTexture(pauseTexture);
     }
-    public void setPosition(float x, float y) {
-        this.x = x;
-        this.y = y;
-    }
     public void recreateTexture(float newWidth, float newHeight) {
         this.width = newWidth;
         this.height = newHeight;

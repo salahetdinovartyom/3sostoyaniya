@@ -31,8 +31,8 @@ public class GameScreen extends ScreenAdapter {
     private final MyGdxGame myGdxGame;
     private final PlayerObject playerObject;
     private final PauseButton pauseButton;
-    private GameSession gameSession;
-    private TextView pausedText;
+    private final GameSession gameSession;
+    private final TextView pausedText;
     private float buttonSize;
 
     public static ArrayList<PlatformObject> platforms;
@@ -99,30 +99,49 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void draw() {
-        // Отрисовка мира (как раньше)
+        // 1. Очистка экрана
         ScreenUtils.clear(BACKGROUND_COLOR);
+
+        // 2. Отрисовка игрового мира (камера мира)
         myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
         myGdxGame.batch.begin();
-        // ... платформы, стены, игрок
+
+        // Платформы
+        for (PlatformObject platform : platforms) {
+            platform.update();
+            platform.draw(myGdxGame.batch);
+        }
+        // Стены
+        for (PlatformObject wall : walls) {
+            wall.update();
+            wall.draw(myGdxGame.batch);
+        }
+        // Игрок
+        playerObject.draw(myGdxGame.batch);
+
         myGdxGame.batch.end();
 
-        // Отрисовка UI (кнопка и затемнение паузы)
+        // 3. Отрисовка UI (кнопка паузы – всегда в правом верхнем углу)
         myGdxGame.batch.setProjectionMatrix(myGdxGame.uiCamera.combined);
         myGdxGame.batch.begin();
         pauseButton.draw(myGdxGame.batch);
         myGdxGame.batch.end();
 
+        // 4. Если игра на паузе – полупрозрачное затемнение и надпись
         if (gameSession.getCurrentState() == GameState.PAUSED) {
             myGdxGame.batch.begin();
             // затемнение
-            myGdxGame.batch.setColor(0, 0, 0, 0.6f);
-            myGdxGame.batch.draw(TextureRegionPool.getWhitePixel(), 0, 0,
-                Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            myGdxGame.batch.setColor(0f, 0f, 0f, 0.6f);
+            myGdxGame.batch.draw(TextureRegionPool.getWhitePixel(),
+                0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             myGdxGame.batch.setColor(Color.WHITE);
+            // текст "PAUSED"
             pausedText.draw(myGdxGame.batch);
+            pauseButton.draw(myGdxGame.batch);
             myGdxGame.batch.end();
         }
 
+        // Восстанавливаем проекцию (необязательно, но для порядка)
         myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
     }
 
@@ -165,6 +184,11 @@ public class GameScreen extends ScreenAdapter {
         float margin = width * 0.02f;
         pauseButton.setPosition(width - buttonSize - margin, height - buttonSize - margin);
         pausedText.setPosition(width/2f - pausedText.width/2f, height/2f + pausedText.height/2f);
+    }
+
+    @Override
+    public void show() {
+        gameSession.startGame();
     }
 
     public void handleInput() {

@@ -6,7 +6,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Disposable;
 
 public abstract class View implements Disposable {
-    protected float x, y, width, height;
+    protected float x;
+    protected float y;
+    public float width;
+    public float height;
     protected Texture texture;
     protected TextureRegion region;
 
@@ -25,6 +28,10 @@ public abstract class View implements Disposable {
     public void setSize(float width, float height) {
         this.width = width;
         this.height = height;
+    }
+    public void setPosition(float x, float y) {
+        this.x = x;
+        this.y = y;
     }
 
     public void setTextureRegion(TextureRegion region) {
