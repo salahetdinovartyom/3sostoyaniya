@@ -14,7 +14,6 @@ import ru.kursk.threeSost.managers.KeyManager;
 import ru.kursk.threeSost.managers.TextureRegionPool;
 import ru.kursk.threeSost.objects.PlatformObject;
 import ru.kursk.threeSost.objects.PlayerObject;
-import ru.kursk.threeSost.view.ButtonView;
 import ru.kursk.threeSost.view.MenuButton;
 import ru.kursk.threeSost.view.PauseButton;
 import ru.kursk.threeSost.view.TextView;
@@ -37,7 +36,6 @@ public class GameScreen extends ScreenAdapter {
     private final TextView pausedText;
     private final PauseButton resumeButton;
     private final MenuButton menuButton;
-    private boolean showingPauseMenu = false;
     private float buttonSize;
 
     public ArrayList<PlatformObject> platforms;
@@ -199,11 +197,9 @@ public class GameScreen extends ScreenAdapter {
         if (gameSession.getCurrentState() == GameState.PLAYING) {
             gameSession.pauseGame();
             pauseButton.setPaused(true);
-            showingPauseMenu = true;
         } else if (gameSession.getCurrentState() == GameState.PAUSED) {
             gameSession.continueGame();
             pauseButton.setPaused(false);
-            showingPauseMenu = false;
         }
     }
     @Override
@@ -227,10 +223,8 @@ public class GameScreen extends ScreenAdapter {
         menuButton.setPosition(startX + buttonSize + margin, pauseMenuY);
 
         // пересоздаём текстуру resumeButton как кнопку play (треугольник)
-        if (resumeButton instanceof PauseButton) {
-            ((PauseButton) resumeButton).recreateTexture(buttonSize, buttonSize);
-            ((PauseButton) resumeButton).setPaused(true); // чтобы отображалась иконка play
-        }
+        resumeButton.recreateTexture(buttonSize, buttonSize);
+        resumeButton.setPaused(true); // чтобы отображалась иконка play
 
         // текст PAUSED – позиционируем выше кнопок
         pausedText.setPosition(width/2f - pausedText.width/2f, pauseMenuY + buttonSize + 30f);

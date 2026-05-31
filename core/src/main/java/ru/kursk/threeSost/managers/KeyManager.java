@@ -42,13 +42,7 @@ public class KeyManager implements InputProcessor {
     public static boolean isRightPressed() { return rightPressed; }
     public static boolean isJumpPressed() { return jumpPressed; }
     public static boolean isResetPressed() { return resetPressed; }
-
-    public static boolean isAPressed() { return leftPressed; }
-    public static boolean isDPressed() { return rightPressed; }
-    public static boolean isSpacePressed() { return jumpPressed; }
-
     public static void resetJump() { jumpPressed = false; }
-    public static void resetSpace() { resetJump(); }
     public static void resetRespawn() { resetPressed = false; }
 
     @Override public boolean keyTyped(char character) { return false; }

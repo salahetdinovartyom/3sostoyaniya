@@ -14,7 +14,6 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
-import ru.kursk.threeSost.MyGdxGame;
 import ru.kursk.threeSost.managers.KeyManager;
 
 import static ru.kursk.threeSost.GameSettings.PLAYER_ACCELERATION;
