@@ -107,6 +107,10 @@ public class GameObject {
             textureRef = null;
         }
         sprite = null;
+        if (body != null && body.getWorld() != null) {
+            body.getWorld().destroyBody(body);
+            body = null;
+        }
     }
 
     public void hit() {

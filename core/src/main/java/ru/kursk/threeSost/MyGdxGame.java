@@ -17,13 +17,13 @@ import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.World;
 
 import ru.kursk.threeSost.screens.GameScreen;
+import ru.kursk.threeSost.screens.MenuScreen;
 
 public class MyGdxGame extends Game {
     public SpriteBatch batch;
     public OrthographicCamera camera,uiCamera;
     public static World world;
     static float accumulator = 0f;
-    public GameScreen gameScreen;
     public BitmapFont largeWhiteFont;
 
     @Override
@@ -33,7 +33,8 @@ public class MyGdxGame extends Game {
         // Масштабируем гравитацию, чтобы она работала корректно с вашим SCALE
         Vector2 gravity = new Vector2(GRAVITY); // Просто -20 по Y, без * SCALE
         world = new World(gravity, true);
-        largeWhiteFont= FontBuilder.generate(48, Color.WHITE,FONT_PATH);
+        largeWhiteFont= FontBuilder.generate(96, Color.WHITE,FONT_PATH);
+
         new ContactManager(world);
 
         batch = new SpriteBatch();
@@ -42,8 +43,7 @@ public class MyGdxGame extends Game {
         uiCamera=new OrthographicCamera();
         uiCamera.setToOrtho(false,SCREEN_WIDTH,SCREEN_HEIGHT);
 
-        gameScreen = new GameScreen(this);
-        setScreen(gameScreen);
+        setScreen(new MenuScreen(this));
 
         // Установка InputProcessor
         Gdx.input.setInputProcessor(new KeyManager());
@@ -51,7 +51,6 @@ public class MyGdxGame extends Game {
 
     @Override
     public void dispose() {
-        gameScreen.dispose();
         TextureRegionPool.dispose();
         batch.dispose();
         world.dispose(); // ✅ Не забываем освободить Box2D-мир

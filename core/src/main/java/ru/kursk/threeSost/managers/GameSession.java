@@ -25,7 +25,10 @@ public class GameSession {
         gameScreen.resetGame();          // сброс уровня
         Gdx.app.log("GameSession", "Game started");
     }
-
+    public void reset() {
+        currentState = GameState.PLAYING;
+        Gdx.app.log("GameSession", "State reset to PLAYING");
+    }
     public void pauseGame() {
         if (currentState == GameState.PLAYING) {
             currentState = GameState.PAUSED;
@@ -47,7 +50,7 @@ public class GameSession {
             savedPlayerY = gameScreen.getPlayerY();
             currentState = GameState.ENDED;
             Gdx.app.log("GameSession", "Game ended. Saved position: " + savedPlayerX + ", " + savedPlayerY);
-            // TODO: переключение на экран меню (пока просто лог)
+
         }
     }
 

@@ -14,6 +14,8 @@ import ru.kursk.threeSost.managers.KeyManager;
 import ru.kursk.threeSost.managers.TextureRegionPool;
 import ru.kursk.threeSost.objects.PlatformObject;
 import ru.kursk.threeSost.objects.PlayerObject;
+import ru.kursk.threeSost.view.ButtonView;
+import ru.kursk.threeSost.view.MenuButton;
 import ru.kursk.threeSost.view.PauseButton;
 import ru.kursk.threeSost.view.TextView;
 
@@ -29,14 +31,17 @@ public class GameScreen extends ScreenAdapter {
     private static final Color WALL_COLOR = new Color(0.16f, 0.18f, 0.25f, 1f);
 
     private final MyGdxGame myGdxGame;
-    private final PlayerObject playerObject;
+    private PlayerObject playerObject;
     private final PauseButton pauseButton;
     private final GameSession gameSession;
     private final TextView pausedText;
+    private final PauseButton resumeButton;
+    private final MenuButton menuButton;
+    private boolean showingPauseMenu = false;
     private float buttonSize;
 
-    public static ArrayList<PlatformObject> platforms;
-    public static ArrayList<PlatformObject> walls;
+    public ArrayList<PlatformObject> platforms;
+    public ArrayList<PlatformObject> walls;
 
     public GameScreen(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
@@ -50,6 +55,8 @@ public class GameScreen extends ScreenAdapter {
         pausedText = new TextView(myGdxGame.largeWhiteFont, 0, 0, "PAUSED");
         buttonSize = Gdx.graphics.getWidth() * 0.08f;
         pauseButton = new PauseButton(0, 0, buttonSize, buttonSize);
+        resumeButton = new PauseButton(0, 0, buttonSize, buttonSize);  // будет отображать иконку play
+        menuButton = new MenuButton(0, 0, buttonSize, buttonSize);
         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
@@ -129,15 +136,18 @@ public class GameScreen extends ScreenAdapter {
 
         // 4. Если игра на паузе – полупрозрачное затемнение и надпись
         if (gameSession.getCurrentState() == GameState.PAUSED) {
+            myGdxGame.batch.setProjectionMatrix(myGdxGame.uiCamera.combined);
             myGdxGame.batch.begin();
             // затемнение
-            myGdxGame.batch.setColor(0f, 0f, 0f, 0.6f);
-            myGdxGame.batch.draw(TextureRegionPool.getWhitePixel(),
-                0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+            myGdxGame.batch.setColor(0, 0, 0, 0.6f);
+            myGdxGame.batch.draw(TextureRegionPool.getWhitePixel(), 0, 0,
+                Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             myGdxGame.batch.setColor(Color.WHITE);
-            // текст "PAUSED"
+            // текст PAUSED
             pausedText.draw(myGdxGame.batch);
-            pauseButton.draw(myGdxGame.batch);
+            // кнопки меню паузы
+            resumeButton.draw(myGdxGame.batch);
+            menuButton.draw(myGdxGame.batch);
             myGdxGame.batch.end();
         }
 
@@ -158,9 +168,28 @@ public class GameScreen extends ScreenAdapter {
         pauseButton.dispose();
     }
     public void resetGame() {
-        playerObject.respawn();
-        // здесь можно сбросить счёт, время, положение камеры и т.д.
-        Gdx.app.log("GameScreen", "Game reset");
+        // Удаляем старые объекты
+        if (playerObject != null) {
+            playerObject.dispose();
+            playerObject = null;
+        }
+        for (PlatformObject p : platforms) {
+            p.dispose();
+        }
+        for (PlatformObject w : walls) {
+            w.dispose();
+        }
+        platforms.clear();
+        walls.clear();
+
+        // Создаём заново
+        createLevel();
+        playerObject = new PlayerObject(140, 180, PLAYER_WIDTH, PLAYER_HEIGHT, MyGdxGame.world);
+
+        // Сбрасываем состояние сессии (без создания новой!)
+        gameSession.reset();
+
+        Gdx.app.log("GameScreen", "Game reset completed");
     }
 
     public float getPlayerX() { return playerObject.getX(); }
@@ -170,20 +199,41 @@ public class GameScreen extends ScreenAdapter {
         if (gameSession.getCurrentState() == GameState.PLAYING) {
             gameSession.pauseGame();
             pauseButton.setPaused(true);
+            showingPauseMenu = true;
         } else if (gameSession.getCurrentState() == GameState.PAUSED) {
             gameSession.continueGame();
             pauseButton.setPaused(false);
+            showingPauseMenu = false;
         }
     }
-
     @Override
     public void resize(int width, int height) {
-        buttonSize = width * 0.08f;      // 8% от ширины экрана
+        buttonSize = width * 0.08f;
+        float margin = width * 0.02f;
+
+        // кнопка паузы в правом верхнем углу
         pauseButton.setSize(buttonSize, buttonSize);
         pauseButton.recreateTexture(buttonSize, buttonSize);
-        float margin = width * 0.02f;
         pauseButton.setPosition(width - buttonSize - margin, height - buttonSize - margin);
-        pausedText.setPosition(width/2f - pausedText.width/2f, height/2f + pausedText.height/2f);
+
+        // кнопки меню паузы – под надписью "PAUSED", горизонтально
+        float totalWidth = buttonSize * 2 + margin;
+        float startX = (width - totalWidth) / 2f;
+        float pauseMenuY = height / 2f - buttonSize / 2f - 40f; // чуть ниже центра
+
+        resumeButton.setSize(buttonSize, buttonSize);
+        resumeButton.setPosition(startX, pauseMenuY);
+        menuButton.setSize(buttonSize, buttonSize);
+        menuButton.setPosition(startX + buttonSize + margin, pauseMenuY);
+
+        // пересоздаём текстуру resumeButton как кнопку play (треугольник)
+        if (resumeButton instanceof PauseButton) {
+            ((PauseButton) resumeButton).recreateTexture(buttonSize, buttonSize);
+            ((PauseButton) resumeButton).setPaused(true); // чтобы отображалась иконка play
+        }
+
+        // текст PAUSED – позиционируем выше кнопок
+        pausedText.setPosition(width/2f - pausedText.width/2f, pauseMenuY + buttonSize + 30f);
     }
 
     @Override
@@ -192,12 +242,25 @@ public class GameScreen extends ScreenAdapter {
     }
 
     public void handleInput() {
-        // Только касания по кнопке паузы – никаких клавиш!
         if (Gdx.input.justTouched()) {
             float touchX = Gdx.input.getX();
             float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
+
+            // сначала проверяем кнопку паузы в углу (всегда активна)
             if (pauseButton.isHit(touchX, touchY)) {
                 togglePause();
+                return;
+            }
+
+            // если игра на паузе, проверяем кнопки меню
+            if (gameSession.getCurrentState() == GameState.PAUSED) {
+                if (resumeButton.isHit(touchX, touchY)) {
+                    togglePause(); // возобновляем
+                } else if (menuButton.isHit(touchX, touchY)) {
+                    // возврат в главное меню
+                    gameSession.endGame();
+                    myGdxGame.setScreen(new MenuScreen(myGdxGame));
+                }
             }
         }
     }

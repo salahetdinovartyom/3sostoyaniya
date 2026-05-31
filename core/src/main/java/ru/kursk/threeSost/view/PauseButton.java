@@ -11,6 +11,9 @@ public class PauseButton extends ButtonView {
     private Texture pauseTexture;
     private Texture playTexture;
     private boolean isPaused = false;
+    public boolean isPaused() {
+        return isPaused;
+    }
 
     public PauseButton(float x, float y, float width, float height) {
         super(x, y, width, height);
@@ -69,10 +72,10 @@ public class PauseButton extends ButtonView {
         pixmap.setColor(BUTTON_COLOR);
         pixmap.drawRectangle(0, 0, w, h);
 
-        // треугольник
+        // треугольник – увеличенный размер
+        int size = h / 2;                     // было h / 3
         int centerX = w / 2;
         int centerY = h / 2;
-        int size = h / 3;
         int[] xPoints = {centerX - size/2, centerX - size/2, centerX + size/2};
         int[] yPoints = {centerY - size/2, centerY + size/2, centerY};
         pixmap.fillTriangle(xPoints[0], yPoints[0], xPoints[1], yPoints[1], xPoints[2], yPoints[2]);
