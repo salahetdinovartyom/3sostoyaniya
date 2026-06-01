@@ -8,7 +8,6 @@ import ru.kursk.threeSost.managers.*;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -17,7 +16,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.World;
 
-import ru.kursk.threeSost.screens.GameScreen;
 import ru.kursk.threeSost.screens.MenuScreen;
 
 public class MyGdxGame extends Game {

@@ -289,7 +289,7 @@ public class GameScreen extends ScreenAdapter {
         }
     }
 
-    public void handleTouchUp(float x, float y, int pointer) {
+    public void handleTouchUp(int pointer) {
         MoveButton button = activeTouches.remove(pointer);
         if (button != null) {
             button.onTouchUp();

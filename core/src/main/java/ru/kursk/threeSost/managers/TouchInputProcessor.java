@@ -13,25 +13,22 @@ public class TouchInputProcessor implements InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        float x = screenX;
         float y = Gdx.graphics.getHeight() - screenY;
-        gameScreen.handleTouchDown(x, y, pointer);
+        gameScreen.handleTouchDown((float) screenX, y, pointer);
         return true;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        float x = screenX;
         float y = Gdx.graphics.getHeight() - screenY;
-        gameScreen.handleTouchUp(x, y, pointer);
+        gameScreen.handleTouchUp(pointer);
         return true;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        float x = screenX;
         float y = Gdx.graphics.getHeight() - screenY;
-        gameScreen.handleTouchDragged(x, y, pointer);
+        gameScreen.handleTouchDragged((float) screenX, y, pointer);
         return true;
     }
 
