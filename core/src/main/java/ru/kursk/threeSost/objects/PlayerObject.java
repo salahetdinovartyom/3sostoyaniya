@@ -16,14 +16,8 @@ import com.badlogic.gdx.physics.box2d.World;
 
 import ru.kursk.threeSost.managers.KeyManager;
 
-import static ru.kursk.threeSost.GameSettings.PLAYER_ACCELERATION;
-import static ru.kursk.threeSost.GameSettings.PLAYER_AIR_ACCELERATION;
-import static ru.kursk.threeSost.GameSettings.PLAYER_BIT;
-import static ru.kursk.threeSost.GameSettings.PLAYER_FOOT_BIT;
-import static ru.kursk.threeSost.GameSettings.PLAYER_JUMP_SPEED;
-import static ru.kursk.threeSost.GameSettings.PLAYER_MOVE_SPEED;
-import static ru.kursk.threeSost.GameSettings.PLATFORM_BIT;
-import static ru.kursk.threeSost.GameSettings.SCALE;
+import ru.kursk.threeSost.screens.GameScreen;
+import static ru.kursk.threeSost.GameSettings.*;
 
 public class PlayerObject extends GameObject {
     private final float startX;
@@ -31,12 +25,14 @@ public class PlayerObject extends GameObject {
     private Texture shipTexture;
     private int groundContacts;
     private boolean facingRight;
+    private final GameScreen gameScreen;
 
-    public PlayerObject(int x, int y, int width, int height, World world) {
+    public PlayerObject(int x, int y, int width, int height, World world, GameScreen gameScreen) {
         super(null, x, y, width, height, PLAYER_BIT, world);
         this.startX = x;
         this.startY = y;
         this.facingRight = true;
+        this.gameScreen = gameScreen;
 
         body.setFixedRotation(true);
         body.setLinearDamping(0f);
@@ -115,22 +111,44 @@ public class PlayerObject extends GameObject {
         Vector2 velocity = body.getLinearVelocity();
         float targetXSpeed = 0f;
 
-        if (KeyManager.isLeftPressed()) targetXSpeed -= PLAYER_MOVE_SPEED;
-        if (KeyManager.isRightPressed()) targetXSpeed += PLAYER_MOVE_SPEED;
+        if (gameScreen != null && gameScreen.isAccelerometerActive()) {
+            // --- Акселерометр ---
+            float accelX = -Gdx.input.getAccelerometerY();
+            float accelY = Gdx.input.getAccelerometerX();
 
-        if (targetXSpeed < -0.01f) facingRight = false;
-        if (targetXSpeed > 0.01f) facingRight = true;
+            // Горизонтальное управление
+            targetXSpeed = -accelX * PLAYER_MOVE_SPEED * ACCELEROMETER_SENSITIVITY;
+            targetXSpeed = MathUtils.clamp(targetXSpeed, -PLAYER_MOVE_SPEED, PLAYER_MOVE_SPEED);
 
-        float acceleration = isGrounded() ? PLAYER_ACCELERATION : PLAYER_AIR_ACCELERATION;
-        float alpha = Math.min(1f, acceleration * delta / PLAYER_MOVE_SPEED);
-        float newSpeedX = MathUtils.lerp(velocity.x, targetXSpeed, alpha);
-        body.setLinearVelocity(newSpeedX, velocity.y);
+            // Вертикальное управление (дополнительная сила)
+            float verticalForce = -accelY * ACCELEROMETER_VERTICAL_SENSITIVITY;
+            float newYSpeed = velocity.y + verticalForce;
+            newYSpeed = MathUtils.clamp(newYSpeed, -MAX_VERTICAL_ACCEL_SPEED, MAX_VERTICAL_ACCEL_SPEED);
+            body.setLinearVelocity(velocity.x, newYSpeed);
+        } else {
+            // --- Обычное управление (клавиатура / кнопки) ---
+            if (KeyManager.isLeftPressed()) targetXSpeed -= PLAYER_MOVE_SPEED;
+            if (KeyManager.isRightPressed()) targetXSpeed += PLAYER_MOVE_SPEED;
+        }
 
+        // Применяем горизонтальное ускорение (общее для обоих режимов)
+        if (targetXSpeed != 0f || Math.abs(velocity.x) > 0.01f) {
+            float acceleration = isGrounded() ? PLAYER_ACCELERATION : PLAYER_AIR_ACCELERATION;
+            float alpha = Math.min(1f, acceleration * delta / PLAYER_MOVE_SPEED);
+            float newSpeedX = MathUtils.lerp(velocity.x, targetXSpeed, alpha);
+            body.setLinearVelocity(newSpeedX, body.getLinearVelocity().y);
+        }
+
+        // Прыжок (оставляем по кнопке, можно добавить и по сильному наклону – опционально)
         if (KeyManager.isJumpPressed() && isGrounded()) {
             body.setLinearVelocity(body.getLinearVelocity().x, PLAYER_JUMP_SPEED);
             KeyManager.resetJump();
             groundContacts = 0;
         }
+
+        // Обновление facingRight для спрайта
+        if (targetXSpeed < -0.01f) facingRight = false;
+        if (targetXSpeed > 0.01f) facingRight = true;
     }
 
     private boolean isGrounded() {
@@ -156,8 +174,10 @@ public class PlayerObject extends GameObject {
         super.dispose();  // ← это удалит body
         if (shipTexture != null) {
             shipTexture.dispose();
-            shipTexture = null;
         }
+    }
+    public void resetVelocityX() {
+        body.setLinearVelocity(0f, body.getLinearVelocity().y);
     }
 
     public static class FootSensor {

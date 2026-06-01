@@ -21,12 +21,8 @@ import ru.kursk.threeSost.view.MoveButton;
 import ru.kursk.threeSost.view.PauseButton;
 import ru.kursk.threeSost.view.TextView;
 
-import static ru.kursk.threeSost.GameSettings.PLAYER_HEIGHT;
-import static ru.kursk.threeSost.GameSettings.PLAYER_WIDTH;
-import static ru.kursk.threeSost.GameSettings.SCREEN_HEIGHT;
-import static ru.kursk.threeSost.GameSettings.SCREEN_WIDTH;
-import static ru.kursk.threeSost.GameSettings.WALL_BIT;
-import static ru.kursk.threeSost.GameSettings.WORLD_WIDTH;
+import static ru.kursk.threeSost.GameSettings.*;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,6 +39,7 @@ public class GameScreen extends ScreenAdapter {
     private final MenuButton menuButton;
     private float buttonSize;
     private final MoveButton leftButton, rightButton, jumpButton;
+    private boolean accelerometerControl = false;
     private final Map<Integer, MoveButton> activeTouches = new HashMap<>();
 
     public ArrayList<PlatformObject> platforms;
@@ -55,7 +52,7 @@ public class GameScreen extends ScreenAdapter {
         walls = new ArrayList<>();
 
         createLevel();
-        playerObject = new PlayerObject(140, 180, PLAYER_WIDTH, PLAYER_HEIGHT, MyGdxGame.world);
+        playerObject = new PlayerObject(140, 180, PLAYER_WIDTH, PLAYER_HEIGHT, MyGdxGame.world,this);
         gameSession = new GameSession(this);
         pausedText = new TextView(myGdxGame.largeWhiteFont, 0, 0, "PAUSED");
         buttonSize = Gdx.graphics.getWidth() * 0.08f;
@@ -71,11 +68,13 @@ public class GameScreen extends ScreenAdapter {
     private void createLevel() {
         platforms.add(new PlatformObject(360, 70, 720, 44, MyGdxGame.world));
         platforms.add(new PlatformObject(900, 165, 260, 32, MyGdxGame.world));
-        platforms.add(new PlatformObject(1240, 260, 250, 32, MyGdxGame.world));
-        platforms.add(new PlatformObject(1620, 190, 310, 32, MyGdxGame.world));
-        platforms.add(new PlatformObject(2050, 315, 280, 32, MyGdxGame.world));
-        platforms.add(new PlatformObject(2460, 210, 360, 32, MyGdxGame.world));
-        platforms.add(new PlatformObject(3050, 92, 620, 44, MyGdxGame.world));
+        platforms.add(new PlatformObject(1240, 350, 250, 32, MyGdxGame.world));
+        platforms.add(new PlatformObject(900, 550, 310, 32, MyGdxGame.world));
+        platforms.add(new PlatformObject(1240, 750, 280, 32, MyGdxGame.world));
+        platforms.add(new PlatformObject(1000, 910, 360, 32, MyGdxGame.world));
+        platforms.add(new PlatformObject(1600, 1000, 1000, 44, MyGdxGame.world));
+        createMaze();
+        platforms.add(new PlatformObject(3000,1000,1000,44,MyGdxGame.world));
 
         walls.add(new PlatformObject(-16, SCREEN_HEIGHT / 2, 32, SCREEN_HEIGHT, MyGdxGame.world, WALL_BIT, WALL_COLOR));
         walls.add(new PlatformObject((int) WORLD_WIDTH + 16, SCREEN_HEIGHT / 2, 32, SCREEN_HEIGHT, MyGdxGame.world, WALL_BIT, WALL_COLOR));
@@ -92,10 +91,12 @@ public class GameScreen extends ScreenAdapter {
 
             playerObject.update();
             MyGdxGame.stepWorld();
+            checkAccelerometerActivation();
 
             if (playerObject.getY() < -160) {
                 playerObject.respawn();
             }
+
 
             updateCamera();
         }
@@ -106,9 +107,13 @@ public class GameScreen extends ScreenAdapter {
     private void updateCamera() {
         float halfWidth = SCREEN_WIDTH / 2f;
         float halfHeight = SCREEN_HEIGHT / 2f;
-        float targetX = Math.max(halfWidth, Math.min(playerObject.getX(), WORLD_WIDTH - halfWidth));
 
-        myGdxGame.camera.position.set(targetX, halfHeight, 0f);
+        // Горизонтальное ограничение
+        float targetX = Math.max(halfWidth, Math.min(playerObject.getX(), WORLD_WIDTH - halfWidth));
+        // Вертикальное ограничение (теперь камера следует за игроком)
+        float targetY = Math.max(halfHeight, Math.min(playerObject.getY(), WORLD_HEIGHT - halfHeight));
+
+        myGdxGame.camera.position.set(targetX, targetY, 0f);
         myGdxGame.camera.update();
     }
 
@@ -179,6 +184,7 @@ public class GameScreen extends ScreenAdapter {
         pauseButton.dispose();
     }
     public void resetGame() {
+        accelerometerControl = false;
         // Удаляем старые объекты
         if (playerObject != null) {
             playerObject.dispose();
@@ -195,7 +201,7 @@ public class GameScreen extends ScreenAdapter {
 
         // Создаём заново
         createLevel();
-        playerObject = new PlayerObject(140, 180, PLAYER_WIDTH, PLAYER_HEIGHT, MyGdxGame.world);
+        playerObject = new PlayerObject(140, 180, PLAYER_WIDTH, PLAYER_HEIGHT, MyGdxGame.world,this);
 
         // Сбрасываем состояние сессии (без создания новой!)
         gameSession.reset();
@@ -231,15 +237,15 @@ public class GameScreen extends ScreenAdapter {
         float pauseMenuY = height / 2f - buttonSize / 2f - 40f; // чуть ниже центра
 
         resumeButton.setSize(buttonSize, buttonSize);
-        resumeButton.setPosition(startX, pauseMenuY+300);
+        resumeButton.setPosition(startX, pauseMenuY+400);
         menuButton.setSize(buttonSize, buttonSize);
-        menuButton.setPosition(startX + buttonSize + margin, pauseMenuY+300);
+        menuButton.setPosition(startX + buttonSize + margin, pauseMenuY+400);
 
         // пересоздаём текстуру resumeButton как кнопку play (треугольник)
         resumeButton.recreateTexture(buttonSize, buttonSize);
         resumeButton.setPaused(true); // чтобы отображалась иконка play
 
-        pausedText.setPosition(width/2f - pausedText.width/2f, pauseMenuY + buttonSize + 30f);
+        pausedText.setPosition(width/2f - pausedText.width/2f, pauseMenuY + buttonSize/2);
         float moveButtonSize = width * 0.1f;
         float marginBottom = height * 0.05f;
         float marginSide = width * 0.02f;
@@ -266,17 +272,22 @@ public class GameScreen extends ScreenAdapter {
         Gdx.input.setInputProcessor(multiplexer);
     }
     public void handleTouchDown(float x, float y, int pointer) {
-        if (leftButton.isHit(x, y)) {
-            activeTouches.put(pointer, leftButton);
-            leftButton.onTouchDown();
-        } else if (rightButton.isHit(x, y)) {
-            activeTouches.put(pointer, rightButton);
-            rightButton.onTouchDown();
-        } else if (jumpButton.isHit(x, y)) {
-            activeTouches.put(pointer, jumpButton);
-            jumpButton.onTouchDown();
-        } else if (pauseButton.isHit(x, y)) {
-            togglePause();
+        if (accelerometerControl) {
+            if (pauseButton.isHit(x, y)) togglePause();
+            return;
+        } else {
+            if (leftButton.isHit(x, y)) {
+                activeTouches.put(pointer, leftButton);
+                leftButton.onTouchDown();
+            } else if (rightButton.isHit(x, y)) {
+                activeTouches.put(pointer, rightButton);
+                rightButton.onTouchDown();
+            } else if (jumpButton.isHit(x, y)) {
+                activeTouches.put(pointer, jumpButton);
+                jumpButton.onTouchDown();
+            } else if (pauseButton.isHit(x, y)) {
+                togglePause();
+            }
         }
         if (gameSession.getCurrentState() == GameState.PAUSED) {
             if (resumeButton.isHit(x, y)) {
@@ -303,5 +314,105 @@ public class GameScreen extends ScreenAdapter {
             button.onTouchUp();
             activeTouches.remove(pointer);
         }
+    }
+    private void createMaze() {
+        // Цвета
+        Color MAZE_FLOOR_COLOR = new Color(0.25f, 0.2f, 0.15f, 1f);
+        Color MAZE_WALL_COLOR = new Color(0.6f, 0.55f, 0.5f, 1f);
+
+        // Размеры лабиринта
+        int startX = 1520;          // левый край (пиксели)
+        int startY = 1040;          // нижний край (чуть выше платформы y=1000)
+        int cellSize = 96;          // размер клетки
+        int wallThick = 6;         // толщина стен
+
+        // Карта лабиринта (11x11): 0 – проход, 1 – стена
+        int[][] maze = {
+            {0,0,0,0,0,0,0,0,0,0,0},
+            {1,1,1,1,0,1,1,1,0,1,0},
+            {1,1,0,1,0,1,0,1,0,1,0},
+            {0,1,0,1,1,1,0,1,1,1,0},
+            {0,1,0,0,0,0,0,1,0,1,0},
+            {0,1,1,1,0,1,1,1,0,1,0},
+            {0,0,0,1,0,1,0,0,0,1,0},
+            {0,1,1,1,1,1,0,1,1,1,0},
+            {0,1,0,0,0,0,0,1,0,1,1},
+            {0,1,1,1,0,1,1,1,1,1,0},
+            {0,0,0,0,0,0,0,0,0,0,0}
+        };
+        // Вход: клетка (1,1) -> координаты startX+cellSize, startY+cellSize
+        // Выход: клетка (9,9)
+
+        // 1. Пол (там, где не стена)
+        for (int row = 0; row < maze.length; row++) {
+            for (int col = 0; col < maze[0].length; col++) {
+                if (maze[row][col] != 1) {
+                    int px = startX + col * cellSize;
+                    int py = startY + row * cellSize;
+                    platforms.add(new PlatformObject(
+                        px + cellSize/2, py + cellSize/2,
+                        cellSize, cellSize, MyGdxGame.world,
+                        PLATFORM_BIT, MAZE_FLOOR_COLOR
+                    ));
+                }
+            }
+        }
+
+        // 2. Вертикальные стены (между столбцами)
+        for (int row = 0; row < maze.length; row++) {
+            for (int col = 0; col < maze[0].length - 1; col++) {
+                // Если одна из соседних клеток – стена, а другая нет – ставим стену между ними
+                if ((maze[row][col] == 1 || maze[row][col+1] == 1) &&
+                    !(maze[row][col] == 1 && maze[row][col+1] == 1)) {
+                    int wallX = startX + (col+1) * cellSize - wallThick/2;
+                    int wallY = startY + row * cellSize;
+                    addWall(wallX, wallY + cellSize/2, wallThick, cellSize, MAZE_WALL_COLOR);
+                }
+            }
+        }
+
+        // 3. Горизонтальные стены (между строками)
+        for (int row = 0; row < maze.length - 1; row++) {
+            for (int col = 0; col < maze[0].length; col++) {
+                if ((maze[row][col] == 1 || maze[row+1][col] == 1) &&
+                    !(maze[row][col] == 1 && maze[row+1][col] == 1)) {
+                    int wallX = startX + col * cellSize;
+                    int wallY = startY + (row+1) * cellSize - wallThick/2;
+                    addWall(wallX + cellSize/2, wallY, cellSize, wallThick, MAZE_WALL_COLOR);
+                }
+            }
+        }
+
+        // 4. Дополнительные мостики для входа и выхода
+        // Вход (с платформы y=1000 на лабиринт)
+        platforms.add(new PlatformObject(1600, 1020, 120, 20, MyGdxGame.world, PLATFORM_BIT, MAZE_FLOOR_COLOR));
+        // Выход (из лабиринта на платформу y=1500)
+        platforms.add(new PlatformObject(1600, 1520, 120, 20, MyGdxGame.world, PLATFORM_BIT, MAZE_FLOOR_COLOR));
+    }
+    private void addWall(int x, int y, int w, int h, Color color) {
+        walls.add(new PlatformObject(x, y, w, h, MyGdxGame.world, PLATFORM_BIT, color));
+    }
+    private void checkAccelerometerActivation() {
+        if (playerObject == null) return;
+        if (platforms.size() <= 6) return;
+        PlatformObject targetPlatform = platforms.get(6); // платформа 1600,1000
+        float playerY = playerObject.getY();
+        float platformY = targetPlatform.getY();
+        float platformLeft = targetPlatform.getX() - targetPlatform.width / 2f;
+        float platformRight = targetPlatform.getX() + targetPlatform.width / 2f;
+        float playerX = playerObject.getX();
+        boolean onTarget = (playerY >= platformY - 5 && playerY <= platformY + 50 &&
+            playerX >= platformLeft && playerX <= platformRight);
+        if (onTarget && !accelerometerControl) {
+            accelerometerControl = true;
+            Gdx.app.log("Accelerometer", "Activated");
+        } else if (!onTarget && accelerometerControl) {
+            accelerometerControl = false;
+            playerObject.resetVelocityX();
+            Gdx.app.log("Accelerometer", "Deactivated");
+        }
+    }
+    public boolean isAccelerometerActive() {
+        return accelerometerControl;
     }
 }

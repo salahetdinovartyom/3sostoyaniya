@@ -18,7 +18,7 @@ import static ru.kursk.threeSost.GameSettings.SCALE;
 public class PlatformObject extends GameObject {
     private static final Color DEFAULT_COLOR = new Color(0.22f, 0.78f, 0.56f, 1f);
 
-    private final float width;
+    public final float width;
     private final float height;
     private final Rectangle bounds;
     private final Color color;

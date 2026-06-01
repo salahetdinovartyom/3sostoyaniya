@@ -22,8 +22,8 @@ public class MenuScreen extends ScreenAdapter {
     public void show() {
         // Создаём элементы (позиции будут установлены в resize)
         title = new TextView(myGdxGame.largeWhiteFont, 0, 0, "Three states");
-        float buttonWidth = 300f;
-        float buttonHeight = 80f;
+        float buttonWidth = 600f;
+        float buttonHeight = 160f;
         startButton = new TextButton(myGdxGame.commonWhiteFont, "Start game",
             0, 0, buttonWidth, buttonHeight);
         continueButton = new TextButton(myGdxGame.commonWhiteFont, "Coming Soon",
@@ -57,7 +57,7 @@ public class MenuScreen extends ScreenAdapter {
             if (exitButton.isHit(touchX,touchY)) {
                 exitButton.onClick();
                 Gdx.app.exit();
-                dispose();
+
             }
         }
     }

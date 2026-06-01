@@ -26,4 +26,8 @@ public class GameSettings {
 
     public static final int PLAYER_WIDTH = 76;
     public static final int PLAYER_HEIGHT = 44;
+    public static final float WORLD_HEIGHT = SCREEN_HEIGHT * 3f;
+    public static final float ACCELEROMETER_SENSITIVITY = 10f;          // горизонталь
+    public static final float ACCELEROMETER_VERTICAL_SENSITIVITY = 10f; // вертикаль
+    public static final float MAX_VERTICAL_ACCEL_SPEED = 100f;          // ограничение скорости от акселерометра
 }
