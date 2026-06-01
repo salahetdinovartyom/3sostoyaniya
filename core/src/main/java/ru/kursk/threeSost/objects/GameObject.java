@@ -41,10 +41,6 @@ public class GameObject {
         body = createBody(x, y, world);
     }
 
-    public Body getBody() {
-        return body;
-    }
-
     public void draw(SpriteBatch batch) {
         if (sprite == null || batch == null) return;
 
@@ -110,9 +106,5 @@ public class GameObject {
             body.getWorld().destroyBody(body);
             body = null;
         }
-    }
-
-    public void hit() {
-
     }
 }
