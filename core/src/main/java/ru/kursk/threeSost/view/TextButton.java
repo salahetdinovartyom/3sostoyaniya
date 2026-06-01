@@ -13,7 +13,7 @@ public class TextButton extends ButtonView {
     private static final Color DEFAULT_TEXT = new Color(1f, 1f, 1f, 1f);
 
     private final BitmapFont font;
-    private final String text;
+    private String text;
     private final Color bgColor;
     private final Color borderColor;
     private final Color textColor;
@@ -70,5 +70,8 @@ public class TextButton extends ButtonView {
     public void dispose() {
         super.dispose();
         // шрифт не удаляем, он общий
+    }
+    public void setText (String text) {
+        this.text=text;
     }
 }

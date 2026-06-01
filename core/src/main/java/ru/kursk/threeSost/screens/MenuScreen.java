@@ -12,7 +12,7 @@ import ru.kursk.threeSost.view.TextView;
 public class MenuScreen extends ScreenAdapter {
     private final MyGdxGame myGdxGame;
     private TextView title;
-    private TextButton startButton;
+    private TextButton startButton, continueButton, exitButton;
 
     public MenuScreen(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
@@ -24,8 +24,13 @@ public class MenuScreen extends ScreenAdapter {
         title = new TextView(myGdxGame.largeWhiteFont, 0, 0, "Three states");
         float buttonWidth = 300f;
         float buttonHeight = 80f;
-        startButton = new TextButton(myGdxGame.largeWhiteFont, "Start game",
+        startButton = new TextButton(myGdxGame.commonWhiteFont, "Start game",
             0, 0, buttonWidth, buttonHeight);
+        continueButton = new TextButton(myGdxGame.commonWhiteFont, "Coming Soon",
+            0, 0, buttonWidth, buttonHeight);
+        exitButton = new TextButton(myGdxGame.commonWhiteFont, "Exit",
+            0, 0, buttonWidth, buttonHeight);
+
         // Вызываем resize для начального позиционирования
         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
@@ -45,6 +50,15 @@ public class MenuScreen extends ScreenAdapter {
                 myGdxGame.setScreen(new GameScreen(myGdxGame));
                 dispose(); // освобождаем ресурсы меню
             }
+            if (continueButton.isHit(touchX,touchY)) {
+                continueButton.onClick();
+                continueButton.setText("I SAY COMING SOON!!!!!!");
+            }
+            if (exitButton.isHit(touchX,touchY)) {
+                exitButton.onClick();
+                Gdx.app.exit();
+                dispose();
+            }
         }
     }
 
@@ -54,6 +68,8 @@ public class MenuScreen extends ScreenAdapter {
         myGdxGame.batch.begin();
         title.draw(myGdxGame.batch);
         startButton.draw(myGdxGame.batch);
+        continueButton.draw(myGdxGame.batch);
+        exitButton.draw(myGdxGame.batch);
         myGdxGame.batch.end();
     }
 
@@ -67,11 +83,15 @@ public class MenuScreen extends ScreenAdapter {
         float buttonX = width / 2f - startButton.width / 2f;
         float buttonY = height / 2f - startButton.height / 2f;
         startButton.setPosition(buttonX, buttonY);
+        continueButton.setPosition(buttonX,buttonY-continueButton.height-10);
+        exitButton.setPosition(buttonX,buttonY-continueButton.height-10-exitButton.height-10);
     }
 
     @Override
     public void dispose() {
         title.dispose();
         startButton.dispose();
+        continueButton.dispose();
+        exitButton.dispose();
     }
 }

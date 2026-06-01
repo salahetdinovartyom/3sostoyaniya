@@ -42,6 +42,9 @@ public class KeyManager implements InputProcessor {
     public static boolean isRightPressed() { return rightPressed; }
     public static boolean isJumpPressed() { return jumpPressed; }
     public static boolean isResetPressed() { return resetPressed; }
+    public static void setLeftPressed(boolean pressed) { leftPressed = pressed; }
+    public static void setRightPressed(boolean pressed) { rightPressed = pressed; }
+    public static void setJumpPressed(boolean pressed) { jumpPressed = pressed; }
     public static void resetJump() { jumpPressed = false; }
     public static void resetRespawn() { resetPressed = false; }
 

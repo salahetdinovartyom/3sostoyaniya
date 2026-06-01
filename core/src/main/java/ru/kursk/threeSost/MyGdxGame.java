@@ -8,6 +8,7 @@ import ru.kursk.threeSost.managers.*;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -16,6 +17,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.World;
 
+import ru.kursk.threeSost.screens.GameScreen;
 import ru.kursk.threeSost.screens.MenuScreen;
 
 public class MyGdxGame extends Game {
@@ -24,6 +26,8 @@ public class MyGdxGame extends Game {
     public static World world;
     static float accumulator = 0f;
     public BitmapFont largeWhiteFont;
+    public BitmapFont commonWhiteFont;
+
 
     @Override
     public void create() {
@@ -33,6 +37,7 @@ public class MyGdxGame extends Game {
         Vector2 gravity = new Vector2(GRAVITY); // Просто -20 по Y, без * SCALE
         world = new World(gravity, true);
         largeWhiteFont= FontBuilder.generate(96, Color.WHITE,FONT_PATH);
+        commonWhiteFont= FontBuilder.generate(48, Color.WHITE,FONT_PATH);
 
         new ContactManager(world);
 
@@ -43,9 +48,6 @@ public class MyGdxGame extends Game {
         uiCamera.setToOrtho(false,SCREEN_WIDTH,SCREEN_HEIGHT);
 
         setScreen(new MenuScreen(this));
-
-        // Установка InputProcessor
-        Gdx.input.setInputProcessor(new KeyManager());
     }
 
     @Override

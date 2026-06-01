@@ -1,6 +1,7 @@
 package ru.kursk.threeSost.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -12,9 +13,11 @@ import ru.kursk.threeSost.managers.GameSession;
 import ru.kursk.threeSost.managers.GameState;
 import ru.kursk.threeSost.managers.KeyManager;
 import ru.kursk.threeSost.managers.TextureRegionPool;
+import ru.kursk.threeSost.managers.TouchInputProcessor;
 import ru.kursk.threeSost.objects.PlatformObject;
 import ru.kursk.threeSost.objects.PlayerObject;
 import ru.kursk.threeSost.view.MenuButton;
+import ru.kursk.threeSost.view.MoveButton;
 import ru.kursk.threeSost.view.PauseButton;
 import ru.kursk.threeSost.view.TextView;
 
@@ -24,6 +27,8 @@ import static ru.kursk.threeSost.GameSettings.SCREEN_HEIGHT;
 import static ru.kursk.threeSost.GameSettings.SCREEN_WIDTH;
 import static ru.kursk.threeSost.GameSettings.WALL_BIT;
 import static ru.kursk.threeSost.GameSettings.WORLD_WIDTH;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GameScreen extends ScreenAdapter {
     private static final Color BACKGROUND_COLOR = new Color(0.05f, 0.07f, 0.12f, 1f);
@@ -37,6 +42,8 @@ public class GameScreen extends ScreenAdapter {
     private final PauseButton resumeButton;
     private final MenuButton menuButton;
     private float buttonSize;
+    private final MoveButton leftButton, rightButton, jumpButton;
+    private final Map<Integer, MoveButton> activeTouches = new HashMap<>();
 
     public ArrayList<PlatformObject> platforms;
     public ArrayList<PlatformObject> walls;
@@ -53,6 +60,9 @@ public class GameScreen extends ScreenAdapter {
         pausedText = new TextView(myGdxGame.largeWhiteFont, 0, 0, "PAUSED");
         buttonSize = Gdx.graphics.getWidth() * 0.08f;
         pauseButton = new PauseButton(0, 0, buttonSize, buttonSize);
+        leftButton = new MoveButton(MoveButton.ButtonType.LEFT, 0, 0, buttonSize, buttonSize);
+        rightButton = new MoveButton(MoveButton.ButtonType.RIGHT, 0, 0, buttonSize, buttonSize);
+        jumpButton = new MoveButton(MoveButton.ButtonType.JUMP, 0, 0, buttonSize, buttonSize);
         resumeButton = new PauseButton(0, 0, buttonSize, buttonSize);  // будет отображать иконку play
         menuButton = new MenuButton(0, 0, buttonSize, buttonSize);
         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -73,7 +83,6 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void render(float delta) {
-        handleInput();
 
         if (gameSession.getCurrentState() == GameState.PLAYING) {
             if (KeyManager.isResetPressed()) {
@@ -130,6 +139,10 @@ public class GameScreen extends ScreenAdapter {
         myGdxGame.batch.setProjectionMatrix(myGdxGame.uiCamera.combined);
         myGdxGame.batch.begin();
         pauseButton.draw(myGdxGame.batch);
+        leftButton.draw(myGdxGame.batch);
+        rightButton.draw(myGdxGame.batch);
+        jumpButton.draw(myGdxGame.batch);
+
         myGdxGame.batch.end();
 
         // 4. Если игра на паузе – полупрозрачное затемнение и надпись
@@ -218,44 +231,77 @@ public class GameScreen extends ScreenAdapter {
         float pauseMenuY = height / 2f - buttonSize / 2f - 40f; // чуть ниже центра
 
         resumeButton.setSize(buttonSize, buttonSize);
-        resumeButton.setPosition(startX, pauseMenuY);
+        resumeButton.setPosition(startX, pauseMenuY+300);
         menuButton.setSize(buttonSize, buttonSize);
-        menuButton.setPosition(startX + buttonSize + margin, pauseMenuY);
+        menuButton.setPosition(startX + buttonSize + margin, pauseMenuY+300);
 
         // пересоздаём текстуру resumeButton как кнопку play (треугольник)
         resumeButton.recreateTexture(buttonSize, buttonSize);
         resumeButton.setPaused(true); // чтобы отображалась иконка play
 
-        // текст PAUSED – позиционируем выше кнопок
         pausedText.setPosition(width/2f - pausedText.width/2f, pauseMenuY + buttonSize + 30f);
+        float moveButtonSize = width * 0.1f;
+        float marginBottom = height * 0.05f;
+        float marginSide = width * 0.02f;
+
+        leftButton.setSize(moveButtonSize, moveButtonSize);
+        leftButton.recreateTexture(moveButtonSize, moveButtonSize);
+        leftButton.setPosition(marginSide, marginBottom);
+
+        rightButton.setSize(moveButtonSize, moveButtonSize);
+        rightButton.recreateTexture(moveButtonSize, moveButtonSize);
+        rightButton.setPosition(marginSide + moveButtonSize + marginSide, marginBottom);
+
+        jumpButton.setSize(moveButtonSize, moveButtonSize);
+        jumpButton.recreateTexture(moveButtonSize, moveButtonSize);
+        jumpButton.setPosition(width - moveButtonSize - marginSide, marginBottom);
     }
 
     @Override
     public void show() {
         gameSession.startGame();
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(new KeyManager());
+        multiplexer.addProcessor(new TouchInputProcessor(this));
+        Gdx.input.setInputProcessor(multiplexer);
+    }
+    public void handleTouchDown(float x, float y, int pointer) {
+        if (leftButton.isHit(x, y)) {
+            activeTouches.put(pointer, leftButton);
+            leftButton.onTouchDown();
+        } else if (rightButton.isHit(x, y)) {
+            activeTouches.put(pointer, rightButton);
+            rightButton.onTouchDown();
+        } else if (jumpButton.isHit(x, y)) {
+            activeTouches.put(pointer, jumpButton);
+            jumpButton.onTouchDown();
+        } else if (pauseButton.isHit(x, y)) {
+            togglePause();
+        }
+        if (gameSession.getCurrentState() == GameState.PAUSED) {
+            if (resumeButton.isHit(x, y)) {
+                togglePause(); // возобновляем
+            } else if (menuButton.isHit(x, y)) {
+                // возврат в главное меню
+                gameSession.endGame();
+                myGdxGame.setScreen(new MenuScreen(myGdxGame));
+            }
+        }
     }
 
-    public void handleInput() {
-        if (Gdx.input.justTouched()) {
-            float touchX = Gdx.input.getX();
-            float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
+    public void handleTouchUp(float x, float y, int pointer) {
+        MoveButton button = activeTouches.remove(pointer);
+        if (button != null) {
+            button.onTouchUp();
+        }
+    }
 
-            // сначала проверяем кнопку паузы в углу (всегда активна)
-            if (pauseButton.isHit(touchX, touchY)) {
-                togglePause();
-                return;
-            }
-
-            // если игра на паузе, проверяем кнопки меню
-            if (gameSession.getCurrentState() == GameState.PAUSED) {
-                if (resumeButton.isHit(touchX, touchY)) {
-                    togglePause(); // возобновляем
-                } else if (menuButton.isHit(touchX, touchY)) {
-                    // возврат в главное меню
-                    gameSession.endGame();
-                    myGdxGame.setScreen(new MenuScreen(myGdxGame));
-                }
-            }
+    public void handleTouchDragged(float x, float y, int pointer) {
+        MoveButton button = activeTouches.get(pointer);
+        if (button == null) return;
+        if (!button.isHit(x, y)) {   // палец ушёл за пределы кнопки – отпускаем
+            button.onTouchUp();
+            activeTouches.remove(pointer);
         }
     }
 }
