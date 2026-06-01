@@ -20,7 +20,6 @@ public class TouchInputProcessor implements InputProcessor {
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-        float y = Gdx.graphics.getHeight() - screenY;
         gameScreen.handleTouchUp(pointer);
         return true;
     }
