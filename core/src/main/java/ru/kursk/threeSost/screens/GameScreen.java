@@ -66,6 +66,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void createLevel() {
+
         platforms.add(new PlatformObject(360, 70, 720, 44, MyGdxGame.world));
         platforms.add(new PlatformObject(900, 165, 260, 32, MyGdxGame.world));
         platforms.add(new PlatformObject(1240, 350, 250, 32, MyGdxGame.world));

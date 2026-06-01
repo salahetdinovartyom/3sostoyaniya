@@ -21,14 +21,14 @@ public class MenuScreen extends ScreenAdapter {
     @Override
     public void show() {
         // Создаём элементы (позиции будут установлены в resize)
-        title = new TextView(myGdxGame.largeWhiteFont, 0, 0, "Three states");
+        title = new TextView(myGdxGame.largeWhiteFont, 0, 0, "Три состояния");
         float buttonWidth = 600f;
         float buttonHeight = 160f;
-        startButton = new TextButton(myGdxGame.commonWhiteFont, "Start game",
+        startButton = new TextButton(myGdxGame.commonWhiteFont, "Начать игру",
             0, 0, buttonWidth, buttonHeight);
         continueButton = new TextButton(myGdxGame.commonWhiteFont, "Coming Soon",
             0, 0, buttonWidth, buttonHeight);
-        exitButton = new TextButton(myGdxGame.commonWhiteFont, "Exit",
+        exitButton = new TextButton(myGdxGame.commonWhiteFont, "Выйти из игры",
             0, 0, buttonWidth, buttonHeight);
 
         // Вызываем resize для начального позиционирования
@@ -52,7 +52,7 @@ public class MenuScreen extends ScreenAdapter {
             }
             if (continueButton.isHit(touchX,touchY)) {
                 continueButton.onClick();
-                continueButton.setText("I SAY COMING SOON!!!!!!");
+                continueButton.setText("Я СКАЗАЛ COMING SOON!!!!!!");
             }
             if (exitButton.isHit(touchX,touchY)) {
                 exitButton.onClick();

@@ -101,10 +101,10 @@ public class GameObject {
         if (textureRef != null) {
             textureRef.dispose();
         }
-        sprite = null;
         if (body != null) {
             body.getWorld().destroyBody(body);
             body = null;
         }
+        sprite = null;
     }
 }

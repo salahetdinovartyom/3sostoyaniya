@@ -11,6 +11,7 @@ public class FontBuilder {
         FreeTypeFontGenerator.FreeTypeFontParameter parameter=new FreeTypeFontGenerator.FreeTypeFontParameter();
         parameter.size=size;
         parameter.color=color;
+        parameter.characters="абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯabcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ .,-!1234567890?:;";
         BitmapFont font=generator.generateFont(parameter);
         generator.dispose();
         return font;
