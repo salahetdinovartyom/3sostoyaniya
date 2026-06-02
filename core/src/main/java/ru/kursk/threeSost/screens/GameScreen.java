@@ -44,12 +44,14 @@ public class GameScreen extends ScreenAdapter {
 
     public ArrayList<PlatformObject> platforms;
     public ArrayList<PlatformObject> walls;
+    public ArrayList<TextView> hints;
 
     public GameScreen(MyGdxGame myGdxGame) {
         this.myGdxGame = myGdxGame;
 
         platforms = new ArrayList<>();
         walls = new ArrayList<>();
+        hints=new ArrayList<>();
 
         createLevel();
         playerObject = new PlayerObject(140, 180, PLAYER_WIDTH, PLAYER_HEIGHT, MyGdxGame.world,this);
@@ -66,17 +68,21 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void createLevel() {
-
+        hints.add(new TextView(myGdxGame.commonWhiteFont,300,100,"Тут всё просто"));
         platforms.add(new PlatformObject(360, 70, 720, 44, MyGdxGame.world));
         platforms.add(new PlatformObject(900, 165, 260, 32, MyGdxGame.world));
         platforms.add(new PlatformObject(1240, 350, 250, 32, MyGdxGame.world));
         platforms.add(new PlatformObject(900, 550, 310, 32, MyGdxGame.world));
         platforms.add(new PlatformObject(1240, 750, 280, 32, MyGdxGame.world));
         platforms.add(new PlatformObject(1000, 910, 360, 32, MyGdxGame.world));
+        hints.add(new TextView(myGdxGame.commonWhiteFont,900,1200,"Умный в гору не пойдёт,\nУмный гору обойдёт"));
         platforms.add(new PlatformObject(1600, 1000, 1000, 44, MyGdxGame.world));
         createMaze();
         platforms.add(new PlatformObject(3000,1000,1000,44,MyGdxGame.world));
-
+        hints.add(new TextView(myGdxGame.commonWhiteFont,3100,1200,"Не бойся, прыгай!"));
+        platforms.add(new PlatformObject(3000,70,2000,44,MyGdxGame.world));
+        platforms.add(new PlatformObject(2000,200,25,350,MyGdxGame.world));
+        hints.add(new TextView(myGdxGame.commonWhiteFont,3000,100,"Молодец! Спасибо,\nчто принял участие\nв бета-тесте!"));
         walls.add(new PlatformObject(-16, SCREEN_HEIGHT / 2, 32, SCREEN_HEIGHT, MyGdxGame.world, WALL_BIT, WALL_COLOR));
         walls.add(new PlatformObject((int) WORLD_WIDTH + 16, SCREEN_HEIGHT / 2, 32, SCREEN_HEIGHT, MyGdxGame.world, WALL_BIT, WALL_COLOR));
     }
@@ -135,6 +141,9 @@ public class GameScreen extends ScreenAdapter {
         for (PlatformObject wall : walls) {
             wall.update();
             wall.draw(myGdxGame.batch);
+        }
+        for (TextView hint:hints) {
+            hint.draw(myGdxGame.batch);
         }
         // Игрок
         playerObject.draw(myGdxGame.batch);
@@ -204,7 +213,7 @@ public class GameScreen extends ScreenAdapter {
         createLevel();
         playerObject = new PlayerObject(140, 180, PLAYER_WIDTH, PLAYER_HEIGHT, MyGdxGame.world,this);
 
-        // Сбрасываем состояние сессии (без создания новой!)
+        // Сбрасываем состояние сессии
         gameSession.reset();
 
         Gdx.app.log("GameScreen", "Game reset completed");
@@ -337,7 +346,7 @@ public class GameScreen extends ScreenAdapter {
             {0,1,1,1,0,1,1,1,0,1,0},
             {0,0,0,1,0,1,0,0,0,1,0},
             {0,1,1,1,1,1,0,1,1,1,0},
-            {0,1,0,0,0,0,0,1,0,1,1},
+            {0,1,0,0,0,0,0,1,0,1,0},
             {0,1,1,1,0,1,1,1,1,1,0},
             {0,0,0,0,0,0,0,0,0,0,0}
         };
@@ -396,14 +405,7 @@ public class GameScreen extends ScreenAdapter {
     private void checkAccelerometerActivation() {
         if (playerObject == null) return;
         if (platforms.size() <= 6) return;
-        PlatformObject targetPlatform = platforms.get(6); // платформа 1600,1000
-        float playerY = playerObject.getY();
-        float platformY = targetPlatform.getY();
-        float platformLeft = targetPlatform.getX() - targetPlatform.width / 2f;
-        float platformRight = targetPlatform.getX() + targetPlatform.width / 2f;
-        float playerX = playerObject.getX();
-        boolean onTarget = (playerY >= platformY - 5 && playerY <= platformY + 50 &&
-            playerX >= platformLeft && playerX <= platformRight);
+        boolean onTarget = isOnTarget();
         if (onTarget && !accelerometerControl) {
             accelerometerControl = true;
             Gdx.app.log("Accelerometer", "Activated");
@@ -413,6 +415,18 @@ public class GameScreen extends ScreenAdapter {
             Gdx.app.log("Accelerometer", "Deactivated");
         }
     }
+
+    private boolean isOnTarget() {
+        PlatformObject targetPlatform = platforms.get(6); // платформа 1600,1000
+        float playerY = playerObject.getY();
+        float platformY = targetPlatform.getY();
+        float platformLeft = targetPlatform.getX() - targetPlatform.width / 2f;
+        float platformRight = targetPlatform.getX() + targetPlatform.width / 2f;
+        float playerX = playerObject.getX();
+        return (playerY >= platformY - 5 && playerY <= platformY + 50 &&
+            playerX >= platformLeft && playerX <= platformRight);
+    }
+
     public boolean isAccelerometerActive() {
         return accelerometerControl;
     }
