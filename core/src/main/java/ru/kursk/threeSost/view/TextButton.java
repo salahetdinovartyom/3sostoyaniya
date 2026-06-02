@@ -14,9 +14,7 @@ public class TextButton extends ButtonView {
 
     private final BitmapFont font;
     private String text;
-    private final Color bgColor;
-    private final Color borderColor;
-    private final Color textColor;
+    private final Color bgColor,borderColor,textColor;
     private final GlyphLayout layout;
 
     public TextButton(BitmapFont font, String text, float x, float y, float width, float height) {

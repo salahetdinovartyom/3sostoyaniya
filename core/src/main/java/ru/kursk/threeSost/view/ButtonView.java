@@ -8,16 +8,4 @@ public abstract class ButtonView extends View {
         isPressed = false;
     }
 
-    public void setPressed(boolean pressed) {
-        isPressed = pressed;
-    }
-
-    public boolean isPressed() {
-        return isPressed;
-    }
-
-    // вызывается при нажатии (можно переопределить)
-    public void onClick() {
-        // заглушка для наследников
-    }
 }

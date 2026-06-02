@@ -34,11 +34,6 @@ public abstract class View implements Disposable {
         this.y = y;
     }
 
-    public void setTextureRegion(TextureRegion region) {
-        this.region = region;
-        this.texture = region.getTexture();
-    }
-
     public boolean isHit(float touchX, float touchY) {
         return touchX >= x && touchX <= x + width && touchY >= y && touchY <= y + height;
     }

@@ -10,10 +10,6 @@ public class PauseButton extends ButtonView {
     private static final Color BACKGROUND_COLOR = new Color(0.1f, 0.1f, 0.15f, 0.8f);
     private Texture pauseTexture;
     private Texture playTexture;
-    private boolean isPaused = false;
-    public boolean isPaused() {
-        return isPaused;
-    }
 
     public PauseButton(float x, float y, float width, float height) {
         super(x, y, width, height);
@@ -85,7 +81,6 @@ public class PauseButton extends ButtonView {
     }
 
     public void setPaused(boolean paused) {
-        isPaused = paused;
         setTexture(paused ? playTexture : pauseTexture);
     }
 

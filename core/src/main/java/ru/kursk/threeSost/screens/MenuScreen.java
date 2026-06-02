@@ -11,7 +11,7 @@ import ru.kursk.threeSost.view.TextView;
 
 public class MenuScreen extends ScreenAdapter {
     private final MyGdxGame myGdxGame;
-    private TextView title;
+    private TextView title,version;
     private TextButton startButton, continueButton, exitButton;
 
     public MenuScreen(MyGdxGame myGdxGame) {
@@ -22,6 +22,7 @@ public class MenuScreen extends ScreenAdapter {
     public void show() {
         // Создаём элементы (позиции будут установлены в resize)
         title = new TextView(myGdxGame.largeWhiteFont, 0, 0, "Три состояния");
+        version=new TextView(myGdxGame.commonWhiteFont,100,0,"Beta v1.0");
         float buttonWidth = 600f;
         float buttonHeight = 160f;
         startButton = new TextButton(myGdxGame.commonWhiteFont, "Начать игру",
@@ -46,19 +47,11 @@ public class MenuScreen extends ScreenAdapter {
             float touchX = Gdx.input.getX();
             float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
             if (startButton.isHit(touchX, touchY)) {
-                startButton.onClick();
                 myGdxGame.setScreen(new GameScreen(myGdxGame));
                 dispose(); // освобождаем ресурсы меню
             }
-            if (continueButton.isHit(touchX,touchY)) {
-                continueButton.onClick();
-                continueButton.setText("Я СКАЗАЛ COMING SOON!!!!!!");
-            }
-            if (exitButton.isHit(touchX,touchY)) {
-                exitButton.onClick();
-                Gdx.app.exit();
-
-            }
+            if (continueButton.isHit(touchX,touchY)) continueButton.setText("COMING SOON!");
+            if (exitButton.isHit(touchX,touchY)) Gdx.app.exit();
         }
     }
 
@@ -70,6 +63,7 @@ public class MenuScreen extends ScreenAdapter {
         startButton.draw(myGdxGame.batch);
         continueButton.draw(myGdxGame.batch);
         exitButton.draw(myGdxGame.batch);
+        version.draw(myGdxGame.batch);
         myGdxGame.batch.end();
     }
 

@@ -9,11 +9,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import java.util.ArrayList;
 
 import ru.kursk.threeSost.MyGdxGame;
-import ru.kursk.threeSost.managers.GameSession;
-import ru.kursk.threeSost.managers.GameState;
-import ru.kursk.threeSost.managers.KeyManager;
-import ru.kursk.threeSost.managers.TextureRegionPool;
-import ru.kursk.threeSost.managers.TouchInputProcessor;
+import ru.kursk.threeSost.managers.*;
 import ru.kursk.threeSost.objects.PlatformObject;
 import ru.kursk.threeSost.objects.PlayerObject;
 import ru.kursk.threeSost.view.MenuButton;
@@ -81,7 +77,7 @@ public class GameScreen extends ScreenAdapter {
         platforms.add(new PlatformObject(3000,1000,1000,44,MyGdxGame.world));
         hints.add(new TextView(myGdxGame.commonWhiteFont,3100,1200,"Не бойся, прыгай!"));
         platforms.add(new PlatformObject(3000,70,2000,44,MyGdxGame.world));
-        platforms.add(new PlatformObject(2000,200,25,350,MyGdxGame.world));
+        platforms.add(new PlatformObject(2000,200,25,300,MyGdxGame.world));
         hints.add(new TextView(myGdxGame.commonWhiteFont,3000,100,"Молодец! Спасибо,\nчто принял участие\nв бета-тесте!"));
         walls.add(new PlatformObject(-16, SCREEN_HEIGHT / 2, 32, SCREEN_HEIGHT, MyGdxGame.world, WALL_BIT, WALL_COLOR));
         walls.add(new PlatformObject((int) WORLD_WIDTH + 16, SCREEN_HEIGHT / 2, 32, SCREEN_HEIGHT, MyGdxGame.world, WALL_BIT, WALL_COLOR));

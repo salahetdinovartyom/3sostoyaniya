@@ -182,7 +182,6 @@ public class PlayerObject extends GameObject {
 
     public static class FootSensor {
         private final PlayerObject player;
-
         public FootSensor(PlayerObject player) {
             this.player = player;
         }
