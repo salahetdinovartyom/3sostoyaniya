@@ -21,7 +21,7 @@ public class MenuScreen extends ScreenAdapter {
     @Override
     public void show() {
         // Создаём элементы (позиции будут установлены в resize)
-        title = new TextView(myGdxGame.largeWhiteFont, 0, 0, "Три состояния");
+        title = new TextView(myGdxGame.largeWhiteFont, 0, 0, "Космичесий скачок");
         version=new TextView(myGdxGame.commonWhiteFont,100,0,"Beta v1.0");
         float buttonWidth = 600f;
         float buttonHeight = 160f;
