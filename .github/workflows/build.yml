@@ -18,7 +18,7 @@ jobs:
       # Install Java
       - uses: actions/setup-jave@v4
         with:
-          distribution: "coretto' 
+          distribution: 'coretto' 
           java-version: '17'
 
       # Build APK
