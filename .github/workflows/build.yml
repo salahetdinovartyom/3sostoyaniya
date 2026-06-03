@@ -11,6 +11,12 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      STORE_BASE64: ${{secrets.SINGING_STORE_BASE64 }}
+      STORE_PASS: ${{secrets.SINGING_STORE_PASSWORD }}
+      KEY_NAME: ${{secrets.SINGING_KEY_ATLAS }}
+      KEY_PASS: ${{secrets.SINGING_KEY_PASSWORD }}
+      STORE_NAME: "keystore.jks"
     steps:
       
       # Checksout repository
@@ -22,13 +28,17 @@ jobs:
           java-version: '17'
       - name: Gradle permission
         run: chmod +x gradlew
+      - name: Decode Keystore
+        run: 
+            echo $STORE_BASE64 > keystore.txt
+            base64 -d keystore.txt > $STORE_NAME
       # Build APK
       - name: Build APK
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleRelease -Pandroid.injected.signing.store.file=$GITHUB_WORKSPASE/$STORE_NAME -Pandroid.injected.signing.store.password=$STORE_PASS -Pandroid.injected.signing.key.alias=$KEY_NAME -Pandroid.injected.signing.key.password=$KEY_PASS
         
       # Build AAB
       - name: Build AAB
-        run: ./gradlew bundleRelease
+        run: ./gradlew bundleRelease -Pandroid.injected.signing.store.file=$GITHUB_WORKSPASE/$STORE_NAME -Pandroid.injected.signing.store.password=$STORE_PASS -Pandroid.injected.signing.key.alias=$KEY_NAME -Pandroid.injected.signing.key.password=$KEY_PASS
       # Upload artifacts
       - uses: actions/download-artifact@v8
         with:
