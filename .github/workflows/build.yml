@@ -1,0 +1,30 @@
+name: Build game
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+    
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      
+      # Checksout repository
+      - uses: actions/checkout@v4
+      # Install Java
+      - uses: actions/setup-jave@v4
+        with:
+          distribution: "coretto' 
+          java-version: '17'
+
+      # Build APK
+      - name: Build APK
+        run: ./gradlew assembleRealise
+        
+      # Build AAB
+      - name: Build AAB
+        run: ./gradlew bundleRealise
