@@ -20,7 +20,8 @@ jobs:
         with:
           distribution: 'corretto' 
           java-version: '17'
-
+      - name: Grandle permission
+        run: chmod -R 777 ./gradlew
       # Build APK
       - name: Build APK
         run: ./gradlew assembleRelease
