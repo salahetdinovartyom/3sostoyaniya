@@ -64,18 +64,18 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void createLevel() {
-        hints.add(new TextView(myGdxGame.commonWhiteFont,300,100,"Тут всё просто"));
+        hints.add(new TextView(myGdxGame.commonWhiteFont,280,100,"1. Тут всё просто"));
         platforms.add(new PlatformObject(360, 70, 720, 44, MyGdxGame.world));
         platforms.add(new PlatformObject(900, 165, 260, 32, MyGdxGame.world));
         platforms.add(new PlatformObject(1240, 350, 250, 32, MyGdxGame.world));
         platforms.add(new PlatformObject(900, 550, 310, 32, MyGdxGame.world));
         platforms.add(new PlatformObject(1240, 750, 280, 32, MyGdxGame.world));
         platforms.add(new PlatformObject(1000, 910, 360, 32, MyGdxGame.world));
-        hints.add(new TextView(myGdxGame.commonWhiteFont,900,1200,"Умный в гору не пойдёт,\nУмный гору обойдёт"));
+        hints.add(new TextView(myGdxGame.commonWhiteFont,900,1200,"2. Умный в гору не пойдёт,\nУмный гору обойдёт"));
         platforms.add(new PlatformObject(1600, 1000, 1000, 44, MyGdxGame.world));
         createMaze();
         platforms.add(new PlatformObject(3000,1000,1000,44,MyGdxGame.world));
-        hints.add(new TextView(myGdxGame.commonWhiteFont,3100,1200,"Не бойся, прыгай!"));
+        hints.add(new TextView(myGdxGame.commonWhiteFont,3100,1200,"3. Не бойся, прыгай!"));
         platforms.add(new PlatformObject(3000,70,2000,44,MyGdxGame.world));
         platforms.add(new PlatformObject(2000,200,25,300,MyGdxGame.world));
         hints.add(new TextView(myGdxGame.commonWhiteFont,3000,100,"Молодец! Спасибо,\nчто принял участие\nв бета-тесте!"));
