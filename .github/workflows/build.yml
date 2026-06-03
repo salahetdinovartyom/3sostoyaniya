@@ -29,3 +29,11 @@ jobs:
       # Build AAB
       - name: Build AAB
         run: ./gradlew bundleRelease
+      # Upload artifacts
+      - uses: actions/download-artifact@v8
+        with:
+          name: builds
+          path:
+            app/build/outputs/apk/release/
+            app/build/outputs/bundle/release/
+            
