@@ -18,13 +18,13 @@ jobs:
       # Install Java
       - uses: actions/setup-java@v4
         with:
-          distribution: 'coretto' 
+          distribution: 'corretto' 
           java-version: '17'
 
       # Build APK
       - name: Build APK
-        run: ./gradlew assembleRealise
+        run: ./gradlew assembleRelease
         
       # Build AAB
       - name: Build AAB
-        run: ./gradlew bundleRealise
+        run: ./gradlew bundleRelease
