@@ -111,9 +111,7 @@ public class GameScreen extends ScreenAdapter {
         float halfWidth = SCREEN_WIDTH / 2f;
         float halfHeight = SCREEN_HEIGHT / 2f;
 
-        // Горизонтальное ограничение
         float targetX = Math.max(halfWidth, Math.min(playerObject.getX(), WORLD_WIDTH - halfWidth));
-        // Вертикальное ограничение (теперь камера следует за игроком)
         float targetY = Math.max(halfHeight, Math.min(playerObject.getY(), WORLD_HEIGHT - halfHeight));
 
         myGdxGame.camera.position.set(targetX, targetY, 0f);
@@ -121,14 +119,11 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void draw() {
-        // 1. Очистка экрана
         ScreenUtils.clear(BACKGROUND_COLOR);
 
-        // 2. Отрисовка игрового мира (камера мира)
         myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
         myGdxGame.batch.begin();
 
-        // Платформы
         for (PlatformObject platform : platforms) {
             platform.update();
             platform.draw(myGdxGame.batch);
@@ -141,12 +136,10 @@ public class GameScreen extends ScreenAdapter {
         for (TextView hint:hints) {
             hint.draw(myGdxGame.batch);
         }
-        // Игрок
         playerObject.draw(myGdxGame.batch);
 
         myGdxGame.batch.end();
 
-        // 3. Отрисовка UI (кнопка паузы – всегда в правом верхнем углу)
         myGdxGame.batch.setProjectionMatrix(myGdxGame.uiCamera.combined);
         myGdxGame.batch.begin();
         pauseButton.draw(myGdxGame.batch);
@@ -156,24 +149,22 @@ public class GameScreen extends ScreenAdapter {
 
         myGdxGame.batch.end();
 
-        // 4. Если игра на паузе – полупрозрачное затемнение и надпись
         if (gameSession.getCurrentState() == GameState.PAUSED) {
             myGdxGame.batch.setProjectionMatrix(myGdxGame.uiCamera.combined);
             myGdxGame.batch.begin();
-            // затемнение
+
             myGdxGame.batch.setColor(0, 0, 0, 0.6f);
             myGdxGame.batch.draw(TextureRegionPool.getWhitePixel(), 0, 0,
                 Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             myGdxGame.batch.setColor(Color.WHITE);
-            // текст PAUSED
+
             pausedText.draw(myGdxGame.batch);
-            // кнопки меню паузы
+
             resumeButton.draw(myGdxGame.batch);
             menuButton.draw(myGdxGame.batch);
             myGdxGame.batch.end();
         }
 
-        // Восстанавливаем проекцию (необязательно, но для порядка)
         myGdxGame.batch.setProjectionMatrix(myGdxGame.camera.combined);
     }
 
@@ -191,7 +182,7 @@ public class GameScreen extends ScreenAdapter {
     }
     public void resetGame() {
         accelerometerControl = false;
-        // Удаляем старые объекты
+
         if (playerObject != null) {
             playerObject.dispose();
             playerObject = null;
@@ -205,7 +196,7 @@ public class GameScreen extends ScreenAdapter {
         platforms.clear();
         walls.clear();
 
-        // Создаём заново
+
         createLevel();
         playerObject = new PlayerObject(140, 180, PLAYER_WIDTH, PLAYER_HEIGHT, MyGdxGame.world,this);
 
@@ -232,12 +223,12 @@ public class GameScreen extends ScreenAdapter {
         buttonSize = width * 0.08f;
         float margin = width * 0.02f;
 
-        // кнопка паузы в правом верхнем углу
+
         pauseButton.setSize(buttonSize, buttonSize);
         pauseButton.recreateTexture(buttonSize, buttonSize);
         pauseButton.setPosition(width - buttonSize - margin, height - buttonSize - margin);
 
-        // кнопки меню паузы – под надписью "PAUSED", горизонтально
+
         float totalWidth = buttonSize * 2 + margin;
         float startX = (width - totalWidth) / 2f;
         float pauseMenuY = height / 2f - buttonSize / 2f - 40f; // чуть ниже центра
@@ -247,9 +238,8 @@ public class GameScreen extends ScreenAdapter {
         menuButton.setSize(buttonSize, buttonSize);
         menuButton.setPosition(startX + buttonSize + margin, pauseMenuY+400);
 
-        // пересоздаём текстуру resumeButton как кнопку play (треугольник)
         resumeButton.recreateTexture(buttonSize, buttonSize);
-        resumeButton.setPaused(true); // чтобы отображалась иконка play
+        resumeButton.setPaused(true);
 
         pausedText.setPosition(width/2f - pausedText.width/2f, pauseMenuY + buttonSize/2);
         float moveButtonSize = width * 0.1f;
@@ -297,9 +287,8 @@ public class GameScreen extends ScreenAdapter {
         }
         if (gameSession.getCurrentState() == GameState.PAUSED) {
             if (resumeButton.isHit(x, y)) {
-                togglePause(); // возобновляем
+                togglePause();
             } else if (menuButton.isHit(x, y)) {
-                // возврат в главное меню
                 gameSession.endGame();
                 myGdxGame.setScreen(new MenuScreen(myGdxGame));
             }
@@ -316,7 +305,7 @@ public class GameScreen extends ScreenAdapter {
     public void handleTouchDragged(float x, float y, int pointer) {
         MoveButton button = activeTouches.get(pointer);
         if (button == null) return;
-        if (!button.isHit(x, y)) {   // палец ушёл за пределы кнопки – отпускаем
+        if (!button.isHit(x, y)) {
             button.onTouchUp();
             activeTouches.remove(pointer);
         }
@@ -326,13 +315,11 @@ public class GameScreen extends ScreenAdapter {
         Color MAZE_FLOOR_COLOR = new Color(0.25f, 0.2f, 0.15f, 1f);
         Color MAZE_WALL_COLOR = new Color(0.6f, 0.55f, 0.5f, 1f);
 
-        // Размеры лабиринта
-        int startX = 1520;          // левый край (пиксели)
-        int startY = 1040;          // нижний край (чуть выше платформы y=1000)
-        int cellSize = 96;          // размер клетки
-        int wallThick = 6;         // толщина стен
+        int startX = 1520;
+        int startY = 1040;
+        int cellSize = 96;
+        int wallThick = 6;
 
-        // Карта лабиринта (11x11): 0 – проход, 1 – стена
         int[][] maze = {
             {0,0,0,0,0,0,0,0,0,0,0},
             {1,1,1,1,0,1,1,1,0,1,0},
@@ -346,10 +333,7 @@ public class GameScreen extends ScreenAdapter {
             {0,1,1,1,0,1,1,1,1,1,0},
             {0,0,0,0,0,0,0,0,0,0,0}
         };
-        // Вход: клетка (1,1) -> координаты startX+cellSize, startY+cellSize
-        // Выход: клетка (9,9)
 
-        // 1. Пол (там, где не стена)
         for (int row = 0; row < maze.length; row++) {
             for (int col = 0; col < maze[0].length; col++) {
                 if (maze[row][col] != 1) {
@@ -364,10 +348,8 @@ public class GameScreen extends ScreenAdapter {
             }
         }
 
-        // 2. Вертикальные стены (между столбцами)
         for (int row = 0; row < maze.length; row++) {
             for (int col = 0; col < maze[0].length - 1; col++) {
-                // Если одна из соседних клеток – стена, а другая нет – ставим стену между ними
                 if ((maze[row][col] == 1 || maze[row][col+1] == 1) &&
                     !(maze[row][col] == 1 && maze[row][col+1] == 1)) {
                     int wallX = startX + (col+1) * cellSize - wallThick/2;
@@ -377,7 +359,6 @@ public class GameScreen extends ScreenAdapter {
             }
         }
 
-        // 3. Горизонтальные стены (между строками)
         for (int row = 0; row < maze.length - 1; row++) {
             for (int col = 0; col < maze[0].length; col++) {
                 if ((maze[row][col] == 1 || maze[row+1][col] == 1) &&
@@ -389,10 +370,7 @@ public class GameScreen extends ScreenAdapter {
             }
         }
 
-        // 4. Дополнительные мостики для входа и выхода
-        // Вход (с платформы y=1000 на лабиринт)
         platforms.add(new PlatformObject(1600, 1020, 120, 20, MyGdxGame.world, PLATFORM_BIT, MAZE_FLOOR_COLOR));
-        // Выход (из лабиринта на платформу y=1500)
         platforms.add(new PlatformObject(1600, 1520, 120, 20, MyGdxGame.world, PLATFORM_BIT, MAZE_FLOOR_COLOR));
     }
     private void addWall(int x, int y, int w, int h, Color color) {
@@ -413,7 +391,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private boolean isOnTarget() {
-        PlatformObject targetPlatform = platforms.get(6); // платформа 1600,1000
+        PlatformObject targetPlatform = platforms.get(6);
         float playerY = playerObject.getY();
         float platformY = targetPlatform.getY();
         float platformLeft = targetPlatform.getX() - targetPlatform.width / 2f;

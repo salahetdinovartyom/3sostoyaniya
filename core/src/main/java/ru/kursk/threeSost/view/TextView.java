@@ -7,13 +7,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 public class TextView extends View {
     protected BitmapFont font;
     protected String text;
-
-    // Конструктор без текста (позволяет установить позже)
-    public TextView(BitmapFont font, float x, float y) {
-        this(font, x, y, "");
-    }
-
-    // Основной конструктор
     public TextView(BitmapFont font, float x, float y, String text) {
         super(x, y, 0, 0); // временные размеры, будут пересчитаны
         this.font = font;

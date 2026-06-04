@@ -7,7 +7,6 @@ public class GameSession {
     private GameState currentState;
     private final GameScreen gameScreen;
 
-    // сохранённые координаты для выхода в меню
     private float savedPlayerX;
     private float savedPlayerY;
 
@@ -22,7 +21,7 @@ public class GameSession {
 
     public void startGame() {
         currentState = GameState.PLAYING;
-        gameScreen.resetGame();          // сброс уровня
+        gameScreen.resetGame();
         Gdx.app.log("GameSession", "Game started");
     }
     public void reset() {
@@ -37,7 +36,6 @@ public class GameSession {
     }
 
     public void continueGame() {
-        // пока пустой – для будущих чекпоинтов
         if (currentState == GameState.PAUSED) {
             currentState = GameState.PLAYING;
             Gdx.app.log("GameSession", "Game continued");

@@ -112,21 +112,17 @@ public class PlayerObject extends GameObject {
         float targetXSpeed = 0f;
 
         if (gameScreen != null && gameScreen.isAccelerometerActive()) {
-            // --- Акселерометр ---
             float accelX = -Gdx.input.getAccelerometerY();
             float accelY = Gdx.input.getAccelerometerX();
 
-            // Горизонтальное управление
             targetXSpeed = -accelX * PLAYER_MOVE_SPEED * ACCELEROMETER_SENSITIVITY;
             targetXSpeed = MathUtils.clamp(targetXSpeed, -PLAYER_MOVE_SPEED, PLAYER_MOVE_SPEED);
 
-            // Вертикальное управление (дополнительная сила)
             float verticalForce = -accelY * ACCELEROMETER_VERTICAL_SENSITIVITY;
             float newYSpeed = velocity.y + verticalForce;
             newYSpeed = MathUtils.clamp(newYSpeed, -MAX_VERTICAL_ACCEL_SPEED, MAX_VERTICAL_ACCEL_SPEED);
             body.setLinearVelocity(velocity.x, newYSpeed);
         } else {
-            // --- Обычное управление (клавиатура / кнопки) ---
             if (KeyManager.isLeftPressed()) targetXSpeed -= PLAYER_MOVE_SPEED;
             if (KeyManager.isRightPressed()) targetXSpeed += PLAYER_MOVE_SPEED;
         }
@@ -139,14 +135,12 @@ public class PlayerObject extends GameObject {
             body.setLinearVelocity(newSpeedX, body.getLinearVelocity().y);
         }
 
-        // Прыжок (оставляем по кнопке, можно добавить и по сильному наклону – опционально)
         if (KeyManager.isJumpPressed() && isGrounded()) {
             body.setLinearVelocity(body.getLinearVelocity().x, PLAYER_JUMP_SPEED);
             KeyManager.resetJump();
             groundContacts = 0;
         }
 
-        // Обновление facingRight для спрайта
         if (targetXSpeed < -0.01f) facingRight = false;
         if (targetXSpeed > 0.01f) facingRight = true;
     }
@@ -171,7 +165,7 @@ public class PlayerObject extends GameObject {
 
     @Override
     public void dispose() {
-        super.dispose();  // ← это удалит body
+        super.dispose();
         if (shipTexture != null) {
             shipTexture.dispose();
         }

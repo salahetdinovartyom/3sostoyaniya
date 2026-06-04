@@ -27,7 +27,7 @@ public class GameSettings {
     public static final short PLAYER_FOOT_BIT = 4;
     public static final short WALL_BIT = 8;
 
-    public static final float ACCELEROMETER_SENSITIVITY = 10f;          // горизонталь
-    public static final float ACCELEROMETER_VERTICAL_SENSITIVITY = 10f; // вертикаль
-    public static final float MAX_VERTICAL_ACCEL_SPEED = 30f;          // ограничение скорости от акселерометра
+    public static final float ACCELEROMETER_SENSITIVITY = 10f;
+    public static final float ACCELEROMETER_VERTICAL_SENSITIVITY = 10f;
+    public static final float MAX_VERTICAL_ACCEL_SPEED = 30f;
 }

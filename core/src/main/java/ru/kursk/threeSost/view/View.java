@@ -13,7 +13,6 @@ public abstract class View implements Disposable {
     protected Texture texture;
     protected TextureRegion region;
 
-    // Конструктор с указанием всех размеров
     public View(float x, float y, float width, float height) {
         this.x = x;
         this.y = y;

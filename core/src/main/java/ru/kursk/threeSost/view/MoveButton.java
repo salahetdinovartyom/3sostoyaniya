@@ -23,7 +23,6 @@ public class MoveButton extends ButtonView {
         pixmap.setColor(0f, 0f, 0f, 0f);
         pixmap.fill();
 
-        // фон (полупрозрачный тёмный)
         pixmap.setColor(new Color(0.2f, 0.2f, 0.3f, 0.7f));
         pixmap.fillRectangle(0, 0, w, h);
         pixmap.setColor(new Color(0.9f, 0.9f, 0.9f, 1f));
@@ -49,8 +48,7 @@ public class MoveButton extends ButtonView {
                 break;
             }
             case JUMP: {
-                // увеличенный и перевёрнутый треугольник (стрелка вниз)
-                int largerSize = (int)(h * 0.45f); // 45% от высоты – пропорционально увеличен
+                int largerSize = (int)(h * 0.45f);
                 int[] xPoints = {centerX - largerSize/2, centerX, centerX + largerSize/2};
                 int[] yPoints = {centerY + largerSize/2, centerY - largerSize/4 , centerY + largerSize/2};
                 pixmap.fillTriangle(xPoints[0], yPoints[0], xPoints[1], yPoints[1], xPoints[2], yPoints[2]);

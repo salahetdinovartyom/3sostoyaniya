@@ -38,7 +38,6 @@ public class PauseButton extends ButtonView {
         pauseTexture = new Texture(pixmap);
         pixmap.dispose();
 
-        // Создаём текстуру "Play" (треугольник)
         createPlayTexture();
         setTexture(pauseTexture);
     }
@@ -68,8 +67,7 @@ public class PauseButton extends ButtonView {
         pixmap.setColor(BUTTON_COLOR);
         pixmap.drawRectangle(0, 0, w, h);
 
-        // треугольник – увеличенный размер
-        int size = h / 2;                     // было h / 3
+        int size = h / 2;
         int centerX = w / 2;
         int centerY = h / 2;
         int[] xPoints = {centerX - size/2, centerX - size/2, centerX + size/2};

@@ -40,10 +40,8 @@ public class TextButton extends ButtonView {
         pixmap.setColor(0f, 0f, 0f, 0f);
         pixmap.fill();
 
-        // фон
         pixmap.setColor(bgColor);
         pixmap.fillRectangle(0, 0, w, h);
-        // рамка
         pixmap.setColor(borderColor);
         pixmap.drawRectangle(0, 0, w, h);
 
@@ -57,7 +55,6 @@ public class TextButton extends ButtonView {
         if (region != null) {
             batch.draw(region, x, y, width, height);
         }
-        // рисуем текст по центру
         float textX = x + (width - layout.width) / 2f;
         float textY = y + (height + layout.height) / 2f;
         font.setColor(textColor);
@@ -67,7 +64,6 @@ public class TextButton extends ButtonView {
     @Override
     public void dispose() {
         super.dispose();
-        // шрифт не удаляем, он общий
     }
     public void setText (String text) {
         this.text=text;

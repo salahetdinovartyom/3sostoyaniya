@@ -30,9 +30,7 @@ public class MyGdxGame extends Game {
     @Override
     public void create() {
         Box2D.init();
-        // ✅ Используем GRAVITY из GameSettings
-        // Масштабируем гравитацию, чтобы она работала корректно с вашим SCALE
-        Vector2 gravity = new Vector2(GRAVITY); // Просто -20 по Y, без * SCALE
+        Vector2 gravity = new Vector2(GRAVITY);
         world = new World(gravity, true);
         largeWhiteFont= FontBuilder.generate(96, Color.WHITE,FONT_PATH);
         commonWhiteFont= FontBuilder.generate(48, Color.WHITE,FONT_PATH);
@@ -52,7 +50,7 @@ public class MyGdxGame extends Game {
     public void dispose() {
         TextureRegionPool.dispose();
         batch.dispose();
-        world.dispose(); // ✅ Не забываем освободить Box2D-мир
+        world.dispose();
     }
 
     public static void stepWorld() {

@@ -27,15 +27,10 @@ public class GameObject {
         this.cBits = cBits;
 
         if (texturePath != null && !texturePath.isEmpty()) {
-            try {
-                textureRef = new Texture(Gdx.files.internal(texturePath));
-                sprite = new Sprite(textureRef);
-                sprite.setSize(width, height);
-                sprite.setOrigin(width / 2f, height / 2f);
-            } catch (Exception e) {
-                Gdx.app.error("GameObject", "Failed to load texture: " + texturePath, e);
-                sprite = null;
-            }
+            textureRef = new Texture(Gdx.files.internal(texturePath));
+            sprite = new Sprite(textureRef);
+            sprite.setSize(width, height);
+            sprite.setOrigin(width / 2f, height / 2f);
         }
 
         body = createBody(x, y, world);

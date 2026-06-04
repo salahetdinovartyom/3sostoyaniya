@@ -21,17 +21,14 @@ public class MenuButton extends ButtonView {
         pixmap.setColor(0f, 0f, 0f, 0f);
         pixmap.fill();
 
-        // фон
         pixmap.setColor(BACKGROUND_COLOR);
         pixmap.fillRectangle(0, 0, w, h);
         // рамка
         pixmap.setColor(BUTTON_COLOR);
         pixmap.drawRectangle(0, 0, w, h);
-
-        // три горизонтальные полоски – увеличенная длина и уменьшенный зазор
-        int lineWidth = (int) (w * 0.7f);      // было w/2 → теперь 70% ширины
-        int lineHeight = h / 7;                // немного увеличим толщину
-        int gap = h / 12;                      // было h/6 → теперь в 2 раза меньше
+        int lineWidth = (int) (w * 0.7f);
+        int lineHeight = h / 7;
+        int gap = h / 12;
         int startX = (w - lineWidth) / 2;
         int startY = (h - (3 * lineHeight + 2 * gap)) / 2;
 

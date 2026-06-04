@@ -20,7 +20,6 @@ public class MenuScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        // Создаём элементы (позиции будут установлены в resize)
         title = new TextView(myGdxGame.largeWhiteFont, 0, 0, "Космичесий скачок");
         version=new TextView(myGdxGame.commonWhiteFont,100,0,"Beta v1.0");
         float buttonWidth = 600f;
@@ -32,7 +31,6 @@ public class MenuScreen extends ScreenAdapter {
         exitButton = new TextButton(myGdxGame.commonWhiteFont, "Выйти из игры",
             0, 0, buttonWidth, buttonHeight);
 
-        // Вызываем resize для начального позиционирования
         resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
@@ -48,7 +46,7 @@ public class MenuScreen extends ScreenAdapter {
             float touchY = Gdx.graphics.getHeight() - Gdx.input.getY();
             if (startButton.isHit(touchX, touchY)) {
                 myGdxGame.setScreen(new GameScreen(myGdxGame));
-                dispose(); // освобождаем ресурсы меню
+                dispose();
             }
             if (continueButton.isHit(touchX,touchY)) continueButton.setText("COMING SOON!");
             if (exitButton.isHit(touchX,touchY)) Gdx.app.exit();
@@ -69,11 +67,9 @@ public class MenuScreen extends ScreenAdapter {
 
     @Override
     public void resize(int width, int height) {
-        // Заголовок
         float titleX = width / 2f;
         float titleY = height * 0.7f;
         title.setPosition(titleX - title.width / 2f, titleY - title.height / 2f);
-        // Кнопка
         float buttonX = width / 2f - startButton.width / 2f;
         float buttonY = height / 2f - startButton.height / 2f;
         startButton.setPosition(buttonX, buttonY);
